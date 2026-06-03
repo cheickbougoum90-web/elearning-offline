@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Élève</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="css/style.css">
+
+<style>
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+    animation: fadeIn 0.6s ease-out;
+}
+</style>
+
+</head>
+
+<body class="bg-gradient-to-br from-blue-50 via-white to-blue-100 min-h-screen">
+
+<!-- NAVBAR -->
+<header class="bg-white shadow-sm sticky top-0 z-10">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+
+        <h1 class="text-xl font-bold text-blue-600">
+            🎓 E-learning
+        </h1>
+
+        <nav class="flex gap-6 text-gray-600 font-medium">
+            <a href="#" class="hover:text-blue-600">Dashboard</a>
+            <a href="cours.html" class="hover:text-blue-600">Cours</a>
+            <a href="quiz.html" class="hover:text-blue-600">Quiz</a>
+            <a href="classement.html" class="hover:text-blue-600">Classement</a>
+        </nav>
+
+    </div>
+</header>
+
+<!-- CONTENU -->
+<main class="max-w-6xl mx-auto p-6 fade-in">
+
+    <!-- HEADER -->
+    <div class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-800">
+            Bienvenue 👋
+        </h2>
+        <p class="text-gray-500">
+            Voici ton espace d’apprentissage
+        </p>
+    </div>
+
+    <!-- GRID CARDS -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <!-- COURS -->
+        <a href="cours.html"
+           class="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition transform hover:-translate-y-1">
+
+            <div class="text-4xl mb-3">📚</div>
+            <h3 class="text-lg font-bold text-gray-800">Cours</h3>
+            <p class="text-gray-500 text-sm mt-1">
+                Accède à tes cours et leçons
+            </p>
+
+            <div class="mt-4 text-blue-600 font-semibold">
+                Accéder →
+            </div>
+
+        </a>
+
+        <!-- QUIZ -->
+        <a href="quiz.html"
+           class="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition transform hover:-translate-y-1">
+
+            <div class="text-4xl mb-3">🧠</div>
+            <h3 class="text-lg font-bold text-gray-800">Quiz</h3>
+            <p class="text-gray-500 text-sm mt-1">
+                Teste tes connaissances
+            </p>
+
+            <div class="mt-4 text-blue-600 font-semibold">
+                Commencer →
+            </div>
+
+        </a>
+
+        <!-- CLASSEMENT -->
+        <a href="classement.html"
+           class="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition transform hover:-translate-y-1">
+
+            <div class="text-4xl mb-3">🏆</div>
+            <h3 class="text-lg font-bold text-gray-800">Classement</h3>
+            <p class="text-gray-500 text-sm mt-1">
+                Voir les meilleurs étudiants
+            </p>
+
+            <div class="mt-4 text-blue-600 font-semibold">
+                Voir →
+            </div>
+
+        </a>
+
+    </div>
+
+    <!-- STAT SECTION -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
+
+        <div class="bg-white p-5 rounded-xl shadow text-center">
+            <p class="text-gray-500 text-sm">Cours suivis</p>
+            <h3 class="text-2xl font-bold text-blue-600">12</h3>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl shadow text-center">
+            <p class="text-gray-500 text-sm">Quiz réussis</p>
+            <h3 class="text-2xl font-bold text-green-600">8</h3>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl shadow text-center">
+            <p class="text-gray-500 text-sm">Classement</p>
+            <h3 class="text-2xl font-bold text-purple-600">#3</h3>
+        </div>
+
+    </div>
+
+</main>
+
+</body>
+</html>

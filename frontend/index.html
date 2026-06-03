@@ -1,15 +1,101 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
-    <meta charset="UTF-8">
-    <title>Projet Frontend</title>
-    <link rel="stylesheet" href="css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - E-learning Offline</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="css/style.css">
+
+<style>
+/* 💥 ANIMATION FADE-IN */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+    animation: fadeIn 0.8s ease-out;
+}
+</style>
+
 </head>
-<body>
 
-    <h1>Frontend du projet</h1>
+<!-- 💙 FOND BLEU CLAIR -->
+<body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-blue-100 to-blue-200">
 
-    <script src="js/auth.js"></script>
-    <script src="js/api.js"></script>
+<!-- CARD LOGIN -->
+<div class="w-full max-w-md bg-white rounded-2xl shadow-xl border border-gray-100 p-8 fade-in">
+
+    <!-- LOGO -->
+    <div class="flex flex-col items-center mb-6">
+
+        <div class="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center text-white text-xl font-bold">
+            EL
+        </div>
+
+        <h1 class="text-2xl font-bold mt-3 text-gray-800">
+           Kamba E-learning Offline
+        </h1>
+
+        <p class="text-gray-500 text-sm">
+            Connectez-vous à votre espace
+        </p>
+
+    </div>
+
+    <!-- TOGGLE -->
+    <div class="flex justify-center mb-5 bg-gray-100 p-1 rounded-full">
+
+        <button id="btnEleve"
+            onclick="setRole('eleve')"
+            class="flex-1 py-2 rounded-full text-sm font-medium bg-white shadow text-blue-600">
+            Étudiant
+        </button>
+
+        <button id="btnProf"
+            onclick="setRole('prof')"
+            class="flex-1 py-2 rounded-full text-sm font-medium text-gray-600">
+            Professeur
+        </button>
+
+    </div>
+
+    <p id="roleText" class="text-center text-xs text-gray-500 mb-4">
+        Rôle sélectionné : Étudiant
+    </p>
+
+    <!-- EMAIL -->
+    <div class="mb-4">
+        <label class="block text-gray-600 mb-1">Email</label>
+        <input id="email" type="email"
+               class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+               placeholder="ex: user@gmail.com">
+    </div>
+
+    <!-- PASSWORD -->
+    <div class="mb-6">
+        <label class="block text-gray-600 mb-1">Mot de passe</label>
+        <input id="password" type="password"
+               class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+               placeholder="********">
+    </div>
+
+    <!-- BUTTON -->
+    <button onclick="login()"
+        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition">
+        Se connecter
+    </button>
+
+    <!-- ERROR -->
+    <p id="error" class="text-red-500 text-sm text-center mt-3 hidden"></p>
+
+</div>
+
+<!-- JS -->
+<script src="js/auth.js"></script>
+
 </body>
 </html>
