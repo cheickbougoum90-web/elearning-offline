@@ -1,28 +1,251 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-<meta charset="UTF-8">
-<title>Professeur</title>
 
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="css/style.css">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Professeur</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+    </style>
+
 </head>
 
-<body>
+<body class="bg-gradient-to-br from-blue-50 via-white to-blue-100 min-h-screen">
 
-<div class="nav">
-    <a href="cours.html">Cours</a>
-    <a href="lecon.html">Leçons</a>
-</div>
+    <!-- HEADER -->
+    <header class="bg-white shadow-sm sticky top-0 z-10">
 
-<div class="p-6">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
 
-    <div class="card">
-        <h2 class="font-bold">Créer un cours</h2>
-        <button class="btn mt-2">Ajouter</button>
-    </div>
+            <div>
+                <h1 class="text-2xl font-bold text-blue-600">
+                    👨‍🏫 E-learning
+                </h1>
+            </div>
 
-</div>
+            <nav class="flex gap-6 text-gray-600 font-medium">
+
+                <a href="prof.html" class="text-blue-600">
+                    Dashboard
+                </a>
+
+                <a href="cours.html" class="hover:text-blue-600 transition">
+                    Cours
+                </a>
+
+                <a href="quiz.html" class="hover:text-blue-600 transition">
+                    Quiz
+                </a>
+
+                <a href="index.html" class="hover:text-red-500 transition">
+                    Déconnexion
+                </a>
+
+            </nav>
+
+        </div>
+
+    </header>
+
+    <!-- CONTENU -->
+    <main class="max-w-7xl mx-auto p-6 fade-in">
+
+        <!-- BIENVENUE -->
+        <section class="mb-8">
+
+            <h2 class="text-3xl font-bold text-gray-800 mb-2">
+                Bienvenue Professeur 👋
+            </h2>
+
+            <p class="text-gray-500">
+                Gérez vos cours, quiz et suivez les performances des étudiants.
+            </p>
+
+        </section>
+
+        <!-- STATISTIQUES -->
+        <section class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+
+            <div class="bg-white rounded-2xl p-6 shadow">
+
+                <div class="text-4xl mb-3">📚</div>
+
+                <h3 class="text-gray-500 text-sm">
+                    Cours publiés
+                </h3>
+
+                <p class="text-3xl font-bold text-blue-600 mt-2">
+                    12
+                </p>
+
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow">
+
+                <div class="text-4xl mb-3">📝</div>
+
+                <h3 class="text-gray-500 text-sm">
+                    Quiz créés
+                </h3>
+
+                <p class="text-3xl font-bold text-green-600 mt-2">
+                    18
+                </p>
+
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow">
+
+                <div class="text-4xl mb-3">👨‍🎓</div>
+
+                <h3 class="text-gray-500 text-sm">
+                    Étudiants inscrits
+                </h3>
+
+                <p class="text-3xl font-bold text-purple-600 mt-2">
+                    145
+                </p>
+
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow">
+
+                <div class="text-4xl mb-3">⭐</div>
+
+                <h3 class="text-gray-500 text-sm">
+                    Note moyenne
+                </h3>
+
+                <p class="text-3xl font-bold text-orange-500 mt-2">
+                    4.8
+                </p>
+
+            </div>
+
+        </section>
+
+        <!-- ACTIONS RAPIDES -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+
+            <a href="cours.html"
+                class="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition transform hover:-translate-y-1">
+
+                <div class="text-5xl mb-4">📚</div>
+
+                <h3 class="text-xl font-bold text-gray-800">
+                    Gérer les cours
+                </h3>
+
+                <p class="text-gray-500 mt-2">
+                    Ajouter, modifier ou supprimer des cours.
+                </p>
+
+                <div class="mt-4 text-blue-600 font-semibold">
+                    Accéder →
+                </div>
+
+            </a>
+
+            <a href="quiz.html"
+                class="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition transform hover:-translate-y-1">
+
+                <div class="text-5xl mb-4">📝</div>
+
+                <h3 class="text-xl font-bold text-gray-800">
+                    Gérer les quiz
+                </h3>
+
+                <p class="text-gray-500 mt-2">
+                    Créer et publier des quiz.
+                </p>
+
+                <div class="mt-4 text-blue-600 font-semibold">
+                    Accéder →
+                </div>
+
+            </a>
+
+            <a href="#"
+                class="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition transform hover:-translate-y-1">
+
+                <div class="text-5xl mb-4">📊</div>
+
+                <h3 class="text-xl font-bold text-gray-800">
+                    Statistiques
+                </h3>
+
+                <p class="text-gray-500 mt-2">
+                    Analyser les performances des étudiants.
+                </p>
+
+                <div class="mt-4 text-blue-600 font-semibold">
+                    Voir →
+                </div>
+
+            </a>
+
+        </section>
+
+        <!-- ACTIVITÉS RÉCENTES -->
+        <section class="bg-white rounded-2xl shadow p-6">
+
+            <h3 class="text-xl font-bold text-gray-800 mb-6">
+                Activités récentes
+            </h3>
+
+            <div class="space-y-4">
+
+                <div class="border-b pb-3">
+                    <p class="font-medium">
+                        Nouveau cours publié : Réseaux IP
+                    </p>
+                    <p class="text-sm text-gray-500">
+                        Il y a 2 heures
+                    </p>
+                </div>
+
+                <div class="border-b pb-3">
+                    <p class="font-medium">
+                        Quiz "TCP/IP" créé avec succès
+                    </p>
+                    <p class="text-sm text-gray-500">
+                        Aujourd'hui
+                    </p>
+                </div>
+
+                <div>
+                    <p class="font-medium">
+                        15 nouveaux étudiants inscrits
+                    </p>
+                    <p class="text-sm text-gray-500">
+                        Cette semaine
+                    </p>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
 
 </body>
+
 </html>
