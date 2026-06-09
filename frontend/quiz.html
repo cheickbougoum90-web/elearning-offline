@@ -1,24 +1,119 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Quiz</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="css/style.css">
+
 </head>
 
-<body>
+<body class="bg-gradient-to-br from-blue-50 via-white to-blue-100 min-h-screen">
 
-<div class="p-6">
+<header class="bg-white shadow-sm">
 
-    <div class="card">
-        <h2>Question 1</h2>
-        <button class="btn mt-2">Réponse A</button>
-        <button class="btn mt-2">Réponse B</button>
-    </div>
+<div class="max-w-5xl mx-auto p-4">
+
+<h1 class="text-xl font-bold text-blue-600">
+🧠 Quiz Réseaux Informatiques
+</h1>
 
 </div>
+
+</header>
+
+<main class="max-w-4xl mx-auto p-6">
+
+<div class="bg-white rounded-2xl shadow p-6">
+
+<h2 class="text-xl font-bold mb-6">
+Question 1
+</h2>
+
+<p class="mb-4">
+Quel protocole est principalement utilisé pour afficher des pages web ?
+</p>
+
+<div class="space-y-3">
+
+<label class="block border rounded-lg p-3 cursor-pointer">
+<input type="radio" name="q1" value="FTP">
+ FTP
+</label>
+
+<label class="block border rounded-lg p-3 cursor-pointer">
+<input type="radio" name="q1" value="HTTP">
+ HTTP
+</label>
+
+<label class="block border rounded-lg p-3 cursor-pointer">
+<input type="radio" name="q1" value="SMTP">
+ SMTP
+</label>
+
+<label class="block border rounded-lg p-3 cursor-pointer">
+<input type="radio" name="q1" value="DNS">
+ DNS
+</label>
+
+</div>
+
+<button onclick="corrigerQuiz()"
+class="mt-6 bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700">
+
+Valider
+
+</button>
+
+<div id="resultat" class="mt-6"></div>
+
+</div>
+
+</main>
+
+<script>
+
+function corrigerQuiz() {
+
+const reponse =
+document.querySelector('input[name="q1"]:checked');
+
+const resultat =
+document.getElementById("resultat");
+
+if(!reponse){
+
+resultat.innerHTML = `
+<p class="text-red-500">
+Veuillez sélectionner une réponse.
+</p>
+`;
+
+return;
+}
+
+if(reponse.value === "HTTP"){
+
+resultat.innerHTML = `
+<div class="bg-green-100 text-green-700 p-4 rounded-lg">
+✅ Bonne réponse ! Score : 1/1
+</div>
+`;
+}
+else{
+
+resultat.innerHTML = `
+<div class="bg-red-100 text-red-700 p-4 rounded-lg">
+❌ Mauvaise réponse. La bonne réponse était HTTP.
+</div>
+`;
+}
+
+}
+</script>
 
 </body>
 </html>
