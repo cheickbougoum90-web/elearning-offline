@@ -1,151 +1,248 @@
 <!DOCTYPE html>
+
 <html lang="fr">
 
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Dashboard</title>
+<title>Administration - E-Learning Offline</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 
 </head>
 
-<body class="bg-gray-50">
+<body class="bg-gray-100">
 
 <div class="flex min-h-screen">
 
+```
 <!-- SIDEBAR -->
-<aside class="w-64 bg-white shadow-lg p-6">
+<aside class="w-64 bg-white shadow-lg">
 
-<h1 class="text-xl font-bold text-blue-600 mb-8">
-⚙️ Admin Panel
-</h1>
+    <div class="p-6 border-b">
+        <h1 class="text-2xl font-bold text-blue-600">
+            ⚙️ Admin Panel
+        </h1>
+    </div>
 
-<nav class="space-y-2 text-gray-700">
+    <nav class="p-4 space-y-2">
 
-<a href="admin.html"
-   class="block p-2 rounded hover:bg-gray-100 text-blue-600 font-bold">
-📊 Dashboard
-</a>
+        <a href="admin.html"
+           class="block p-3 rounded-lg bg-blue-50 text-blue-600 font-semibold">
+           📊 Dashboard
+        </a>
 
-<a href="#"
-   class="block p-2 rounded hover:bg-gray-100">
-👥 Utilisateurs
-</a>
+        <a href="#utilisateurs"
+           class="block p-3 rounded-lg hover:bg-gray-100">
+           👥 Utilisateurs
+        </a>
 
-<a href="cours.html"
-   class="block p-2 rounded hover:bg-gray-100">
-📚 Cours
-</a>
+        <a href="cours.html"
+           class="block p-3 rounded-lg hover:bg-gray-100">
+           📚 Cours
+        </a>
 
-<a href="quiz.html"
-   class="block p-2 rounded hover:bg-gray-100">
-📝 Quiz
-</a>
+        <a href="quiz.html"
+           class="block p-3 rounded-lg hover:bg-gray-100">
+           📝 Quiz
+        </a>
 
-<a href="classement.html"
-   class="block p-2 rounded hover:bg-gray-100">
-🏆 Classement
-</a>
+        <a href="classement.html"
+           class="block p-3 rounded-lg hover:bg-gray-100">
+           🏆 Classement
+        </a>
 
-<a href="eleve.html"
-   class="block p-2 rounded hover:bg-gray-100">
-🎓 Espace Élève
-</a>
+        <a href="eleve.html"
+           class="block p-3 rounded-lg hover:bg-gray-100">
+           🎓 Espace Élève
+        </a>
 
-<a href="prof.html"
-   class="block p-2 rounded hover:bg-gray-100">
-👨‍🏫 Espace Professeur
-</a>
+        <a href="prof.html"
+           class="block p-3 rounded-lg hover:bg-gray-100">
+           👨‍🏫 Espace Professeur
+        </a>
 
-</nav>
+    </nav>
 
 </aside>
 
-<!-- MAIN CONTENT -->
+<!-- CONTENU -->
 <main class="flex-1 p-8">
 
-<h2 class="text-2xl font-bold mb-6">
-Tableau de bord administrateur
-</h2>
+    <div class="flex justify-between items-center mb-8">
 
-<!-- STATS -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div>
+            <h2 class="text-3xl font-bold">
+                Tableau de bord Administrateur
+            </h2>
 
-<div class="bg-white p-6 rounded-xl shadow hover:shadow-md transition">
-<h3 class="text-gray-500">Utilisateurs</h3>
-<p class="text-3xl font-bold text-blue-600">120</p>
-</div>
+            <p class="text-gray-500">
+                Gestion de la plateforme E-Learning Offline
+            </p>
+        </div>
 
-<div class="bg-white p-6 rounded-xl shadow hover:shadow-md transition">
-<h3 class="text-gray-500">Cours</h3>
-<p class="text-3xl font-bold text-green-600">45</p>
-</div>
+        <button
+            class="bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700">
 
-<div class="bg-white p-6 rounded-xl shadow hover:shadow-md transition">
-<h3 class="text-gray-500">Quiz</h3>
-<p class="text-3xl font-bold text-purple-600">30</p>
-</div>
+            + Ajouter un utilisateur
 
-</div>
+        </button>
 
-<!-- TABLE -->
-<div class="bg-white rounded-xl shadow p-6">
+    </div>
 
-<h3 class="text-xl font-bold mb-4">
-👥 Gestion des utilisateurs
-</h3>
+    <!-- STATISTIQUES -->
+    <div class="grid md:grid-cols-5 gap-6 mb-8">
 
-<table class="w-full">
+        <div class="bg-white p-6 rounded-xl shadow">
+            <p class="text-gray-500">Utilisateurs</p>
+            <h3 class="text-3xl font-bold text-blue-600">120</h3>
+        </div>
 
-<thead>
-<tr class="border-b text-left">
-<th class="p-3">Nom</th>
-<th class="p-3">Email</th>
-<th class="p-3">Rôle</th>
-<th class="p-3">Actions</th>
-</tr>
-</thead>
+        <div class="bg-white p-6 rounded-xl shadow">
+            <p class="text-gray-500">Étudiants</p>
+            <h3 class="text-3xl font-bold text-cyan-600">108</h3>
+        </div>
 
-<tbody>
+        <div class="bg-white p-6 rounded-xl shadow">
+            <p class="text-gray-500">Professeurs</p>
+            <h3 class="text-3xl font-bold text-orange-600">12</h3>
+        </div>
 
-<tr class="border-b hover:bg-gray-50">
-<td class="p-3">Awa Ndiaye</td>
-<td class="p-3">awa@gmail.com</td>
-<td class="p-3">Élève</td>
-<td class="p-3 space-x-2">
-<button class="text-blue-600 hover:underline">Modifier</button>
-<button class="text-red-600 hover:underline">Supprimer</button>
-</td>
-</tr>
+        <div class="bg-white p-6 rounded-xl shadow">
+            <p class="text-gray-500">Cours</p>
+            <h3 class="text-3xl font-bold text-green-600">45</h3>
+        </div>
 
-<tr class="border-b hover:bg-gray-50">
-<td class="p-3">Mamadou Fall</td>
-<td class="p-3">mamadou@gmail.com</td>
-<td class="p-3">Professeur</td>
-<td class="p-3 space-x-2">
-<button class="text-blue-600 hover:underline">Modifier</button>
-<button class="text-red-600 hover:underline">Supprimer</button>
-</td>
-</tr>
+        <div class="bg-white p-6 rounded-xl shadow">
+            <p class="text-gray-500">Quiz</p>
+            <h3 class="text-3xl font-bold text-purple-600">30</h3>
+        </div>
 
-<tr class="hover:bg-gray-50">
-<td class="p-3">Fatou Diop</td>
-<td class="p-3">fatou@gmail.com</td>
-<td class="p-3">Élève</td>
-<td class="p-3 space-x-2">
-<button class="text-blue-600 hover:underline">Modifier</button>
-<button class="text-red-600 hover:underline">Supprimer</button>
-</td>
-</tr>
+    </div>
 
-</tbody>
+    <!-- UTILISATEURS -->
+    <section id="utilisateurs">
 
-</table>
+        <div class="bg-white rounded-xl shadow p-6">
 
-</div>
+            <div class="flex justify-between items-center mb-4">
+
+                <h3 class="text-xl font-bold">
+                    👥 Gestion des utilisateurs
+                </h3>
+
+            </div>
+
+            <input
+                type="text"
+                placeholder="Rechercher un utilisateur..."
+                class="w-full border rounded-lg p-3 mb-6"
+            >
+
+            <div class="overflow-x-auto">
+
+                <table class="w-full">
+
+                    <thead>
+
+                        <tr class="border-b text-left">
+
+                            <th class="p-3">Nom</th>
+                            <th class="p-3">Email</th>
+                            <th class="p-3">Rôle</th>
+                            <th class="p-3">Statut</th>
+                            <th class="p-3">Actions</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr class="border-b hover:bg-gray-50">
+
+                            <td class="p-3">Awa Ndiaye</td>
+                            <td class="p-3">awa@gmail.com</td>
+                            <td class="p-3">Étudiant</td>
+
+                            <td class="p-3">
+                                <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
+                                    Actif
+                                </span>
+                            </td>
+
+                            <td class="p-3">
+                                <button class="text-blue-600 mr-3">
+                                    Modifier
+                                </button>
+
+                                <button class="text-red-600">
+                                    Supprimer
+                                </button>
+                            </td>
+
+                        </tr>
+
+                        <tr class="border-b hover:bg-gray-50">
+
+                            <td class="p-3">Mamadou Fall</td>
+                            <td class="p-3">mamadou@gmail.com</td>
+                            <td class="p-3">Professeur</td>
+
+                            <td class="p-3">
+                                <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
+                                    Actif
+                                </span>
+                            </td>
+
+                            <td class="p-3">
+                                <button class="text-blue-600 mr-3">
+                                    Modifier
+                                </button>
+
+                                <button class="text-red-600">
+                                    Supprimer
+                                </button>
+                            </td>
+
+                        </tr>
+
+                        <tr class="hover:bg-gray-50">
+
+                            <td class="p-3">Fatou Diop</td>
+                            <td class="p-3">fatou@gmail.com</td>
+                            <td class="p-3">Étudiant</td>
+
+                            <td class="p-3">
+                                <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm">
+                                    En attente
+                                </span>
+                            </td>
+
+                            <td class="p-3">
+                                <button class="text-blue-600 mr-3">
+                                    Modifier
+                                </button>
+
+                                <button class="text-red-600">
+                                    Supprimer
+                                </button>
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </section>
 
 </main>
+```
 
 </div>
 
