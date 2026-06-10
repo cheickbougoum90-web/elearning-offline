@@ -161,7 +161,7 @@
 
                     </thead>
 
-                    <tbody>
+                    <tbody id="usersTable">
 
                         <tr class="border-b hover:bg-gray-50">
 
@@ -284,6 +284,54 @@ window.onclick = function(event) {
 }
 
 </script>
-<script src="js/network.js"></script>
+<script src="js/api.js"></script>
+<script>
+async function loadUsers() {
+
+    try {
+        const users = await getUsers();
+        const table = document.getElementById("usersTable");
+
+        table.innerHTML = "";
+
+        users.forEach(user => {
+
+            table.innerHTML += `
+                <tr class="border-b hover:bg-gray-50">
+
+                    <td class="p-3">${user.nom || user.name}</td>
+                    <td class="p-3">${user.email}</td>
+                    <td class="p-3">${user.role}</td>
+
+                    <td class="p-3">
+                        <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
+                            Actif
+                        </span>
+                    </td>
+
+                    <td class="p-3">
+                        <button onclick="editUser('${user.nom || user.name}')" class="text-blue-600 mr-3">
+                            Modifier
+                        </button>
+
+                        <button onclick="deleteUser('${user.id}')" class="text-red-600">
+                            Supprimer
+                        </button>
+                    </td>
+
+                </tr>
+            `;
+        });
+
+    } catch (error) {
+        console.error("Erreur chargement users:", error);
+    }
+}
+
+// lancer au chargement
+window.onload = function () {
+    loadUsers();
+};
+</script>
 </body>
 </html>

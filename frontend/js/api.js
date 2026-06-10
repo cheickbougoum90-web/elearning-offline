@@ -142,6 +142,33 @@ async function getClassement() {
 
     return handleResponse(res);
 }
+
+async function getUsers() {
+    const res = await fetch(`${API_URL}/api/users/`, {
+        headers: authHeaders()
+    });
+
+    return handleResponse(res);
+}
+
+async function createUser(nom, email, mot_de_passe, role) {
+    const res = await fetch(`${API_URL}/api/users/`, {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify({ nom, email, mot_de_passe, role })
+    });
+
+    return handleResponse(res);
+}
+
+async function deleteUser(id) {
+    const res = await fetch(`${API_URL}/api/users/${id}`, {
+        method: "DELETE",
+        headers: authHeaders()
+    });
+
+    return handleResponse(res);
+}
 async function syncData() {
     const res = await fetch(`${API_URL}/api/sync/`, {
         method: "POST",
