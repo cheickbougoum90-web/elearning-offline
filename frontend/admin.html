@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="fr">
 
 <head>
@@ -8,14 +7,12 @@
 <title>Administration - E-Learning Offline</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
-
 </head>
 
 <body class="bg-gray-100">
 
 <div class="flex min-h-screen">
 
-```
 <!-- SIDEBAR -->
 <aside class="w-64 bg-white shadow-lg">
 
@@ -81,7 +78,7 @@
             </p>
         </div>
 
-        <button
+        <button onclick="openModal()"
             class="bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700">
 
             + Ajouter un utilisateur
@@ -172,11 +169,11 @@
                             </td>
 
                             <td class="p-3">
-                                <button class="text-blue-600 mr-3">
+                                <button onclick="editUser('Awa Ndiaye')" class="text-blue-600 mr-3">
                                     Modifier
                                 </button>
 
-                                <button class="text-red-600">
+                                <button onclick="deleteUser('Awa Ndiaye')" class="text-red-600">
                                     Supprimer
                                 </button>
                             </td>
@@ -196,35 +193,11 @@
                             </td>
 
                             <td class="p-3">
-                                <button class="text-blue-600 mr-3">
+                                <button onclick="editUser('Mamadou Fall')" class="text-blue-600 mr-3">
                                     Modifier
                                 </button>
 
-                                <button class="text-red-600">
-                                    Supprimer
-                                </button>
-                            </td>
-
-                        </tr>
-
-                        <tr class="hover:bg-gray-50">
-
-                            <td class="p-3">Fatou Diop</td>
-                            <td class="p-3">fatou@gmail.com</td>
-                            <td class="p-3">Étudiant</td>
-
-                            <td class="p-3">
-                                <span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm">
-                                    En attente
-                                </span>
-                            </td>
-
-                            <td class="p-3">
-                                <button class="text-blue-600 mr-3">
-                                    Modifier
-                                </button>
-
-                                <button class="text-red-600">
+                                <button onclick="deleteUser('Mamadou Fall')" class="text-red-600">
                                     Supprimer
                                 </button>
                             </td>
@@ -242,9 +215,62 @@
     </section>
 
 </main>
-```
 
 </div>
+
+<!-- MODAL -->
+<div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+
+    <div class="bg-white p-6 rounded-lg w-96">
+
+        <h2 class="text-xl font-bold mb-4">Ajouter utilisateur</h2>
+
+        <input class="w-full border p-2 mb-2" placeholder="Nom">
+        <input class="w-full border p-2 mb-2" placeholder="Email">
+
+        <select class="w-full border p-2 mb-4">
+            <option>Étudiant</option>
+            <option>Professeur</option>
+        </select>
+
+        <div class="flex justify-end gap-2">
+
+            <button onclick="closeModal()" class="px-4 py-2 bg-gray-300 rounded">
+                Annuler
+            </button>
+
+            <button class="px-4 py-2 bg-blue-600 text-white rounded">
+                Ajouter
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- JS -->
+<script>
+
+function openModal() {
+    document.getElementById("modal").classList.remove("hidden");
+}
+
+function closeModal() {
+    document.getElementById("modal").classList.add("hidden");
+}
+
+function editUser(name) {
+    alert("Modifier utilisateur : " + name);
+}
+
+function deleteUser(name) {
+    if(confirm("Supprimer " + name + " ?")) {
+        alert("Utilisateur supprimé (simulation)");
+    }
+}
+
+</script>
 
 </body>
 </html>
