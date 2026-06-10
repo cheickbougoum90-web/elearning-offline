@@ -11,6 +11,13 @@
 
 <body class="bg-gray-100">
 
+ <div class="mb-4">
+    Statut réseau :
+    <span id="network-status" class="font-semibold">
+        ...
+    </span>
+</div>
+
 <div class="flex min-h-screen">
 
 <!-- SIDEBAR -->
@@ -269,8 +276,14 @@ function deleteUser(name) {
         alert("Utilisateur supprimé (simulation)");
     }
 }
+window.onclick = function(event) {
+    let modal = document.getElementById("modal");
+    if (event.target === modal) {
+        closeModal();
+    }
+}
 
 </script>
-
+<script src="js/network.js"></script>
 </body>
 </html>
