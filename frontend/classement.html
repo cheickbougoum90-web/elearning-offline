@@ -1,81 +1,73 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Classement</title>
-
 <script src="https://cdn.tailwindcss.com"></script>
-
 </head>
-
 <body class="bg-gradient-to-br from-blue-50 via-white to-blue-100 min-h-screen">
-
 <header class="bg-white shadow-sm">
-
-<div class="max-w-6xl mx-auto p-4">
-
-<h1 class="text-xl font-bold text-blue-600">
-🏆 Classement des étudiants
-</h1>
-
-</div>
-
+    <div class="max-w-6xl mx-auto p-4 flex justify-between items-center">
+        <h1 class="text-xl font-bold text-blue-600">🏆 Classement des professeurs</h1>
+        <a href="javascript:history.back()" class="text-gray-500 hover:text-blue-600 text-sm">← Retour</a>
+    </div>
 </header>
-
-<main class="max-w-5xl mx-auto p-6">
-
-<div class="bg-white rounded-2xl shadow p-6">
-
-<table class="w-full">
-
-<thead>
-
-<tr class="border-b">
-
-<th class="p-3 text-left">Rang</th>
-<th class="p-3 text-left">Nom</th>
-<th class="p-3 text-left">Score</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-<tr class="border-b">
-<td class="p-3">🥇</td>
-<td class="p-3">Awa Ndiaye</td>
-<td class="p-3">98</td>
-</tr>
-
-<tr class="border-b">
-<td class="p-3">🥈</td>
-<td class="p-3">Mamadou Fall</td>
-<td class="p-3">95</td>
-</tr>
-
-<tr class="border-b">
-<td class="p-3">🥉</td>
-<td class="p-3">Fatou Diop</td>
-<td class="p-3">91</td>
-</tr>
-
-<tr>
-<td class="p-3">4</td>
-<td class="p-3">Ali Sow</td>
-<td class="p-3">88</td>
-</tr>
-
-</tbody>
-
-</table>
-
-</div>
-
+<main class="max-w-3xl mx-auto p-6">
+    <div class="bg-white rounded-2xl shadow p-6">
+        <p class="text-gray-500 text-sm mb-4">
+            Classement basé sur la moyenne des notes attribuées par les élèves après completion des cours.
+        </p>
+        <table class="w-full">
+            <thead>
+                <tr class="border-b text-left text-gray-500 text-sm">
+                    <th class="p-3">Rang</th>
+                    <th class="p-3">Professeur</th>
+                    <th class="p-3">Cours</th>
+                    <th class="p-3">Avis</th>
+                    <th class="p-3">Note moyenne</th>
+                </tr>
+            </thead>
+            <tbody id="classementTable">
+                <tr><td colspan="5" class="p-3 text-center text-gray-400">Chargement...</td></tr>
+            </tbody>
+        </table>
+    </div>
 </main>
+<script src="js/api.js"></script>
+<script>
+requireAuth();
 
+const medailles = ["🥇", "🥈", "🥉"];
+
+async function loadClassement() {
+    const tbody = document.getElementById("classementTable");
+    try {
+        const data = await getClassement();
+        if (!data || data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-gray-400">
+                Aucune note disponible pour le moment.
+            </td></tr>`;
+            return;
+        }
+        tbody.innerHTML = data.map((p, i) => `
+            <tr class="border-b hover:bg-gray-50">
+                <td class="p-3 text-xl">${medailles[i] || (i + 1)}</td>
+                <td class="p-3 font-semibold">${p.nom}</td>
+                <td class="p-3 text-gray-500">${p.nombre_cours}</td>
+                <td class="p-3 text-gray-500">${p.nombre_avis}</td>
+                <td class="p-3">
+                    <span class="font-bold text-yellow-500">${"★".repeat(Math.round(p.moyenne))}</span>
+                    <span class="text-gray-600 text-sm ml-1">${p.moyenne.toFixed(1)}/5</span>
+                </td>
+            </tr>
+        `).join("");
+    } catch(e) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-red-400">Erreur de chargement</td></tr>`;
+    }
+}
+
+loadClassement();
+</script>
 </body>
 </html>

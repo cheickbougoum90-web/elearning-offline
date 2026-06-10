@@ -56,24 +56,22 @@ services:
     networks:
       - elearning_network
 
-#   # ── FRONTEND (en attente du binome) ─────────────────────────────────────────
-#   frontend:
-#     build: ./frontend
-#     container_name: elearning_frontend
-#     restart: always
-#     ports:
-#       - "80:80"
-#     depends_on:
-#       - backend
-#     networks:
-#       - elearning_network
+  # ── FRONTEND ─────────────────────────────────────────
+  frontend:
+    build: ./frontend
+    container_name: elearning_frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - elearning_network
 
-# ── VOLUMES (persistance des données) ────────────────
 volumes:
   postgres_data:
   media_data:
 
-# ── RÉSEAU INTERNE ────────────────────────────────────
 networks:
   elearning_network:
     driver: bridge
