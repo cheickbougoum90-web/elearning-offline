@@ -1,153 +1,188 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Dashboard</title>
-
 <script src="https://cdn.tailwindcss.com"></script>
-
 </head>
-
 <body class="bg-gray-50">
-
 <div class="flex min-h-screen">
 
 <!-- SIDEBAR -->
 <aside class="w-64 bg-white shadow-lg p-6">
-
-<h1 class="text-xl font-bold text-blue-600 mb-8">
-⚙️ Admin Panel
-</h1>
-
-<nav class="space-y-2 text-gray-700">
-
-<a href="admin.html"
-   class="block p-2 rounded hover:bg-gray-100 text-blue-600 font-bold">
-📊 Dashboard
-</a>
-
-<a href="#"
-   class="block p-2 rounded hover:bg-gray-100">
-👥 Utilisateurs
-</a>
-
-<a href="cours.html"
-   class="block p-2 rounded hover:bg-gray-100">
-📚 Cours
-</a>
-
-<a href="quiz.html"
-   class="block p-2 rounded hover:bg-gray-100">
-📝 Quiz
-</a>
-
-<a href="classement.html"
-   class="block p-2 rounded hover:bg-gray-100">
-🏆 Classement
-</a>
-
-<a href="eleve.html"
-   class="block p-2 rounded hover:bg-gray-100">
-🎓 Espace Élève
-</a>
-
-<a href="prof.html"
-   class="block p-2 rounded hover:bg-gray-100">
-👨‍🏫 Espace Professeur
-</a>
-
-</nav>
-
+    <h1 class="text-xl font-bold text-blue-600 mb-8">⚙️ Admin Panel</h1>
+    <nav class="space-y-2 text-gray-700">
+        <a href="admin.html"   class="block p-2 rounded hover:bg-gray-100 text-blue-600 font-bold">📊 Dashboard</a>
+        <a href="cours.html"   class="block p-2 rounded hover:bg-gray-100">📚 Cours</a>
+        <a href="classement.html" class="block p-2 rounded hover:bg-gray-100">🏆 Classement</a>
+        <a onclick="logout()" class="block p-2 rounded hover:bg-red-50 text-red-500 cursor-pointer">🚪 Déconnexion</a>
+    </nav>
 </aside>
 
-<!-- MAIN CONTENT -->
+<!-- MAIN -->
 <main class="flex-1 p-8">
+    <h2 class="text-2xl font-bold mb-6">Tableau de bord administrateur</h2>
 
-<h2 class="text-2xl font-bold mb-6">
-Tableau de bord administrateur
-</h2>
+    <!-- STATS -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white p-6 rounded-xl shadow">
+            <h3 class="text-gray-500">Utilisateurs</h3>
+            <p id="statUsers" class="text-3xl font-bold text-blue-600">—</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow">
+            <h3 class="text-gray-500">Cours</h3>
+            <p id="statCours" class="text-3xl font-bold text-green-600">—</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow">
+            <h3 class="text-gray-500">Sync en attente</h3>
+            <p id="statSync" class="text-3xl font-bold text-orange-500">—</p>
+        </div>
+    </div>
 
-<!-- STATS -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <!-- BOUTON SYNC -->
+    <div class="mb-8">
+        <button onclick="lancerSync()"
+            class="bg-green-600 text-white px-6 py-3 rounded-xl hover:bg-green-700 font-semibold">
+            🔄 Lancer la synchronisation cloud
+        </button>
+        <p id="syncMsg" class="mt-2 text-sm text-gray-500"></p>
+    </div>
 
-<div class="bg-white p-6 rounded-xl shadow hover:shadow-md transition">
-<h3 class="text-gray-500">Utilisateurs</h3>
-<p class="text-3xl font-bold text-blue-600">120</p>
-</div>
+    <!-- FORMULAIRE AJOUT UTILISATEUR -->
+    <div class="bg-white rounded-xl shadow p-6 mb-8">
+        <h3 class="text-lg font-bold mb-4">➕ Créer un utilisateur</h3>
+        <div class="grid grid-cols-2 gap-4 mb-4">
+            <input id="newNom"   type="text"  placeholder="Nom complet"
+                class="border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+            <input id="newEmail" type="email" placeholder="Email"
+                class="border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+            <input id="newPass"  type="password" placeholder="Mot de passe"
+                class="border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+            <select id="newRole"
+                class="border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+                <option value="eleve">Élève</option>
+                <option value="professeur">Professeur</option>
+                <option value="admin">Admin</option>
+            </select>
+        </div>
+        <button onclick="ajouterUser()"
+            class="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700">
+            Créer le compte
+        </button>
+        <p id="userFormMsg" class="mt-2 text-sm hidden"></p>
+    </div>
 
-<div class="bg-white p-6 rounded-xl shadow hover:shadow-md transition">
-<h3 class="text-gray-500">Cours</h3>
-<p class="text-3xl font-bold text-green-600">45</p>
-</div>
-
-<div class="bg-white p-6 rounded-xl shadow hover:shadow-md transition">
-<h3 class="text-gray-500">Quiz</h3>
-<p class="text-3xl font-bold text-purple-600">30</p>
-</div>
-
-</div>
-
-<!-- TABLE -->
-<div class="bg-white rounded-xl shadow p-6">
-
-<h3 class="text-xl font-bold mb-4">
-👥 Gestion des utilisateurs
-</h3>
-
-<table class="w-full">
-
-<thead>
-<tr class="border-b text-left">
-<th class="p-3">Nom</th>
-<th class="p-3">Email</th>
-<th class="p-3">Rôle</th>
-<th class="p-3">Actions</th>
-</tr>
-</thead>
-
-<tbody>
-
-<tr class="border-b hover:bg-gray-50">
-<td class="p-3">Awa Ndiaye</td>
-<td class="p-3">awa@gmail.com</td>
-<td class="p-3">Élève</td>
-<td class="p-3 space-x-2">
-<button class="text-blue-600 hover:underline">Modifier</button>
-<button class="text-red-600 hover:underline">Supprimer</button>
-</td>
-</tr>
-
-<tr class="border-b hover:bg-gray-50">
-<td class="p-3">Mamadou Fall</td>
-<td class="p-3">mamadou@gmail.com</td>
-<td class="p-3">Professeur</td>
-<td class="p-3 space-x-2">
-<button class="text-blue-600 hover:underline">Modifier</button>
-<button class="text-red-600 hover:underline">Supprimer</button>
-</td>
-</tr>
-
-<tr class="hover:bg-gray-50">
-<td class="p-3">Fatou Diop</td>
-<td class="p-3">fatou@gmail.com</td>
-<td class="p-3">Élève</td>
-<td class="p-3 space-x-2">
-<button class="text-blue-600 hover:underline">Modifier</button>
-<button class="text-red-600 hover:underline">Supprimer</button>
-</td>
-</tr>
-
-</tbody>
-
-</table>
-
-</div>
-
+    <!-- TABLE UTILISATEURS -->
+    <div class="bg-white rounded-xl shadow p-6">
+        <h3 class="text-xl font-bold mb-4">👥 Gestion des utilisateurs</h3>
+        <table class="w-full">
+            <thead>
+                <tr class="border-b text-left text-gray-500 text-sm">
+                    <th class="p-3">Nom</th>
+                    <th class="p-3">Email</th>
+                    <th class="p-3">Rôle</th>
+                    <th class="p-3">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="usersTable">
+                <tr><td colspan="4" class="p-3 text-center text-gray-400">Chargement...</td></tr>
+            </tbody>
+        </table>
+    </div>
 </main>
-
 </div>
 
+<script src="js/api.js"></script>
+<script>
+requireAuth();
+if (localStorage.getItem("role") !== "admin") {
+    window.location.href = "index.html";
+}
+
+async function loadDashboard() {
+    // Charger utilisateurs
+    const users = await getUsers();
+    document.getElementById("statUsers").innerText = users.length;
+
+    // Charger cours
+    const cours = await getCours();
+    document.getElementById("statCours").innerText = cours.length;
+
+    // Charger statut sync
+    const sync = await getSyncStatus();
+    document.getElementById("statSync").innerText = sync.en_attente_sync;
+
+    // Remplir la table
+    const tbody = document.getElementById("usersTable");
+    if (users.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">Aucun utilisateur</td></tr>`;
+        return;
+    }
+    tbody.innerHTML = users.map(u => `
+        <tr class="border-b hover:bg-gray-50">
+            <td class="p-3 font-medium">${u.nom}</td>
+            <td class="p-3 text-gray-500">${u.email}</td>
+            <td class="p-3">
+                <span class="px-2 py-1 rounded-full text-xs font-semibold
+                    ${u.role === 'admin' ? 'bg-red-100 text-red-600' :
+                      u.role === 'professeur' ? 'bg-green-100 text-green-600' :
+                      'bg-blue-100 text-blue-600'}">
+                    ${u.role}
+                </span>
+            </td>
+            <td class="p-3">
+                <button onclick="supprimerUser(${u.id}, '${u.nom}')"
+                    class="text-red-500 hover:underline text-sm">
+                    Supprimer
+                </button>
+            </td>
+        </tr>
+    `).join("");
+}
+
+async function ajouterUser() {
+    const nom   = document.getElementById("newNom").value.trim();
+    const email = document.getElementById("newEmail").value.trim();
+    const pass  = document.getElementById("newPass").value;
+    const role  = document.getElementById("newRole").value;
+    const msg   = document.getElementById("userFormMsg");
+
+    try {
+        await createUser(nom, email, pass, role);
+        msg.innerText = "✅ Utilisateur créé avec succès";
+        msg.className = "mt-2 text-sm text-green-600";
+        msg.classList.remove("hidden");
+        document.getElementById("newNom").value   = "";
+        document.getElementById("newEmail").value = "";
+        document.getElementById("newPass").value  = "";
+        loadDashboard();
+    } catch(e) {
+        msg.innerText = "❌ " + e.message;
+        msg.className = "mt-2 text-sm text-red-500";
+        msg.classList.remove("hidden");
+    }
+}
+
+async function supprimerUser(id, nom) {
+    if (!confirm(`Supprimer ${nom} ?`)) return;
+    await deleteUser(id);
+    loadDashboard();
+}
+
+async function lancerSync() {
+    const msg = document.getElementById("syncMsg");
+    msg.innerText = "Synchronisation en cours...";
+    try {
+        const res = await syncData();
+        msg.innerText = `✅ ${res.message} — ${res.donnees_synchronisees} éléments synchronisés`;
+        loadDashboard();
+    } catch(e) {
+        msg.innerText = "❌ Erreur de synchronisation";
+    }
+}
+
+loadDashboard();
+</script>
 </body>
 </html>

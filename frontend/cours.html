@@ -1,105 +1,146 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cours</title>
-
 <script src="https://cdn.tailwindcss.com"></script>
-
 </head>
-
 <body class="bg-gradient-to-br from-blue-50 via-white to-blue-100 min-h-screen">
 
-<!-- ROLE -->
-<script>
-    const role = "prof"; // ⚠️ mets "eleve" ou "prof"
-</script>
-
-<header class="bg-white shadow p-4 flex justify-between">
-    <h1 class="text-blue-600 font-bold">📚 Cours</h1>
-
-    <button id="addBtn" class="bg-blue-600 text-white px-4 py-2 rounded hidden">
-        + Ajouter un cours
-    </button>
+<header class="bg-white shadow p-4 flex justify-between items-center">
+    <h1 class="text-blue-600 font-bold text-lg">📚 Cours</h1>
+    <div class="flex items-center gap-4">
+        <span id="nomUser" class="text-gray-600 text-sm"></span>
+        <button id="addBtn"
+            onclick="showAddForm()"
+            class="bg-blue-600 text-white px-4 py-2 rounded hidden text-sm">
+            + Ajouter un cours
+        </button>
+        <button onclick="logout()" class="text-red-500 text-sm hover:underline">
+            Déconnexion
+        </button>
+    </div>
 </header>
 
-<main class="p-6 grid gap-6 md:grid-cols-3">
-
-    <!-- CARD 1 -->
-    <div class="bg-white p-5 rounded shadow">
-
-        <h2 class="font-bold">Réseaux</h2>
-        <p class="text-gray-500">Intro aux réseaux</p>
-
-        <div class="flex justify-between mt-4">
-            <a href="lecon.html" class="text-blue-600">Ouvrir →</a>
-
-            <div class="actions flex gap-2"></div>
-        </div>
-
+<!-- FORMULAIRE AJOUT (caché par défaut) -->
+<div id="addForm" class="hidden max-w-lg mx-auto mt-6 bg-white p-6 rounded-xl shadow">
+    <h2 class="font-bold text-lg mb-4">Nouveau cours</h2>
+    <input id="newTitre" type="text" placeholder="Titre du cours"
+        class="w-full border p-3 rounded mb-3 focus:outline-none focus:ring-2 focus:ring-blue-400">
+    <textarea id="newDesc" placeholder="Description"
+        class="w-full border p-3 rounded mb-3 focus:outline-none focus:ring-2 focus:ring-blue-400" rows="3"></textarea>
+    <div class="flex gap-3">
+        <button onclick="submitCours()"
+            class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700">
+            Créer
+        </button>
+        <button onclick="hideAddForm()"
+            class="text-gray-500 px-5 py-2 rounded border hover:bg-gray-50">
+            Annuler
+        </button>
     </div>
+    <p id="formError" class="text-red-500 text-sm mt-2 hidden"></p>
+</div>
 
-    <!-- CARD 2 -->
-    <div class="bg-white p-5 rounded shadow">
-
-        <h2 class="font-bold">Java</h2>
-        <p class="text-gray-500">POO Java</p>
-
-        <div class="flex justify-between mt-4">
-            <a href="lecon.html" class="text-blue-600">Ouvrir →</a>
-
-            <div class="actions flex gap-2"></div>
-        </div>
-
-    </div>
-
-    <!-- CARD 3 -->
-    <div class="bg-white p-5 rounded shadow">
-
-        <h2 class="font-bold">Base de données</h2>
-        <p class="text-gray-500">SQL</p>
-
-        <div class="flex justify-between mt-4">
-            <a href="lecon.html" class="text-blue-600">Ouvrir →</a>
-
-            <div class="actions flex gap-2"></div>
-        </div>
-
-    </div>
-
+<!-- LISTE DES COURS -->
+<main id="coursList" class="p-6 grid gap-6 md:grid-cols-3">
+    <div class="col-span-3 text-center text-gray-400 py-10">Chargement des cours...</div>
 </main>
 
+<script src="js/api.js"></script>
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+requireAuth();
 
-    const actions = document.querySelectorAll(".actions");
-    const addBtn = document.getElementById("addBtn");
+const userRole = localStorage.getItem("role");
+const userId   = localStorage.getItem("user_id");
+const userName = localStorage.getItem("nom");
 
-    console.log("ROLE =", role); // 👀 debug
+document.getElementById("nomUser").innerText = userName || "";
 
-    if (role === "prof") {
+if (userRole === "professeur" || userRole === "admin") {
+    document.getElementById("addBtn").classList.remove("hidden");
+}
 
-        // afficher bouton ajouter
-        addBtn.classList.remove("hidden");
+// Charger les cours depuis le backend
+async function loadCours() {
+    const list = document.getElementById("coursList");
+    try {
+        const cours = await getCours();
+        if (!cours || cours.length === 0) {
+            list.innerHTML = `<div class="col-span-3 text-center text-gray-400 py-10">
+                Aucun cours disponible pour le moment.
+            </div>`;
+            return;
+        }
 
-        // ajouter boutons sur chaque cours
-        actions.forEach(el => {
-            el.innerHTML = `
-                <button class="text-green-600 text-sm">Modifier</button>
-                <button class="text-red-600 text-sm">Supprimer</button>
-            `;
-        });
+        list.innerHTML = cours.map(c => `
+            <div class="bg-white p-5 rounded-xl shadow hover:shadow-md transition" id="cours-${c.id}">
+                <div class="flex justify-between items-start mb-2">
+                    <h2 class="font-bold text-gray-800">${c.titre}</h2>
+                    <span class="text-yellow-500 text-sm">★ ${c.moyenne_notes.toFixed(1)}</span>
+                </div>
+                <p class="text-gray-500 text-sm">${c.description || "Pas de description"}</p>
+                <div class="flex justify-between items-center mt-4">
+                    <a href="lecon.html?cours_id=${c.id}&cours_titre=${encodeURIComponent(c.titre)}"
+                        class="text-blue-600 font-semibold hover:underline">
+                        Ouvrir →
+                    </a>
+                    ${(userRole === 'professeur' || userRole === 'admin') ? `
+                    <div class="flex gap-2">
+                        <button onclick="supprimerCours(${c.id})"
+                            class="text-red-500 text-sm hover:underline">
+                            Supprimer
+                        </button>
+                    </div>` : ''}
+                </div>
+            </div>
+        `).join("");
+    } catch(e) {
+        list.innerHTML = `<div class="col-span-3 text-red-500 text-center py-10">
+            Erreur de chargement. Vérifiez la connexion au serveur.
+        </div>`;
+    }
+}
 
-    } else {
-        actions.forEach(el => {
-            el.innerHTML = "";
-        });
+function showAddForm() { document.getElementById("addForm").classList.remove("hidden"); }
+function hideAddForm() { document.getElementById("addForm").classList.add("hidden"); }
+
+async function submitCours() {
+    const titre = document.getElementById("newTitre").value.trim();
+    const desc  = document.getElementById("newDesc").value.trim();
+    const err   = document.getElementById("formError");
+
+    if (!titre) {
+        err.innerText = "Le titre est obligatoire";
+        err.classList.remove("hidden");
+        return;
     }
 
-});
-</script>
+    try {
+        await createCours(titre, desc);
+        hideAddForm();
+        document.getElementById("newTitre").value = "";
+        document.getElementById("newDesc").value  = "";
+        err.classList.add("hidden");
+        loadCours(); // recharger la liste
+    } catch(e) {
+        err.innerText = e.message;
+        err.classList.remove("hidden");
+    }
+}
 
+async function supprimerCours(id) {
+    if (!confirm("Supprimer ce cours ?")) return;
+    try {
+        await deleteCours(id);
+        loadCours();
+    } catch(e) {
+        alert("Erreur : " + e.message);
+    }
+}
+
+loadCours();
+</script>
 </body>
 </html>
