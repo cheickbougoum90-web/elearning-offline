@@ -131,4 +131,16 @@
 </main>
 
 </body>
-</html>
+</html><script src="js/api.js"></script>
+<script>
+requireAuth();
+// Afficher le nom de l'utilisateur
+const nom = localStorage.getItem("nom");
+if (nom) {
+    document.querySelector("h2").innerText = "Bienvenue " + nom + " 👋";
+}
+// Si l'utilisateur n'est pas élève, rediriger
+const role = localStorage.getItem("role");
+if (role === "professeur") window.location.href = "prof.html";
+if (role === "admin")      window.location.href = "admin.html";
+</script>

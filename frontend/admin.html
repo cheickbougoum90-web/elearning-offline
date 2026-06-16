@@ -2,339 +2,765 @@
 <html lang="fr">
 
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Administration - E-Learning Offline</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
+
 </head>
+
 
 <body class="bg-gray-100">
 
- <div class="mb-4">
-    Statut réseau :
-    <span id="network-status" class="font-semibold">
-        ...
-    </span>
-</div>
 
 <div class="flex min-h-screen">
 
-<!-- SIDEBAR -->
+
+<!-- ================= SIDEBAR ================= -->
+
 <aside class="w-64 bg-white shadow-lg">
 
-    <div class="p-6 border-b">
-        <h1 class="text-2xl font-bold text-blue-600">
-            ⚙️ Admin Panel
-        </h1>
-    </div>
 
-    <nav class="p-4 space-y-2">
+<div class="p-6 border-b">
 
-        <a href="admin.html"
-           class="block p-3 rounded-lg bg-blue-50 text-blue-600 font-semibold">
-           📊 Dashboard
-        </a>
+<h1 class="text-2xl font-bold text-blue-600">
+⚙️ Admin Panel
+</h1>
 
-        <a href="#utilisateurs"
-           class="block p-3 rounded-lg hover:bg-gray-100">
-           👥 Utilisateurs
-        </a>
+</div>
 
-        <a href="cours.html"
-           class="block p-3 rounded-lg hover:bg-gray-100">
-           📚 Cours
-        </a>
 
-        <a href="quiz.html"
-           class="block p-3 rounded-lg hover:bg-gray-100">
-           📝 Quiz
-        </a>
 
-        <a href="classement.html"
-           class="block p-3 rounded-lg hover:bg-gray-100">
-           🏆 Classement
-        </a>
+<nav class="p-4 space-y-2">
 
-        <a href="eleve.html"
-           class="block p-3 rounded-lg hover:bg-gray-100">
-           🎓 Espace Élève
-        </a>
 
-        <a href="prof.html"
-           class="block p-3 rounded-lg hover:bg-gray-100">
-           👨‍🏫 Espace Professeur
-        </a>
+<a href="admin.html"
+class="block p-3 rounded-lg bg-blue-50 text-blue-600 font-semibold">
+📊 Dashboard
+</a>
 
-    </nav>
+
+<a href="cours.html"
+class="block p-3 rounded-lg hover:bg-gray-100">
+📚 Cours
+</a>
+
+
+<a href="quiz.html"
+class="block p-3 rounded-lg hover:bg-gray-100">
+📝 Quiz
+</a>
+
+
+<a href="classement.html"
+class="block p-3 rounded-lg hover:bg-gray-100">
+🏆 Classement
+</a>
+
+
+<a href="eleve.html"
+class="block p-3 rounded-lg hover:bg-gray-100">
+🎓 Espace Élève
+</a>
+
+
+<a href="prof.html"
+class="block p-3 rounded-lg hover:bg-gray-100">
+👨‍🏫 Espace Professeur
+</a>
+
+
+<a onclick="logout()"
+class="block p-3 rounded-lg hover:bg-red-50 text-red-600 cursor-pointer">
+🚪 Déconnexion
+</a>
+
+
+</nav>
+
 
 </aside>
 
-<!-- CONTENU -->
+
+
+
+
+<!-- ================= CONTENU ================= -->
+
+
 <main class="flex-1 p-8">
 
-    <div class="flex justify-between items-center mb-8">
 
-        <div>
-            <h2 class="text-3xl font-bold">
-                Tableau de bord Administrateur
-            </h2>
+<!-- HEADER -->
 
-            <p class="text-gray-500">
-                Gestion de la plateforme E-Learning Offline
-            </p>
-        </div>
+<div class="flex justify-between items-center mb-8">
 
-        <button onclick="openModal()"
-            class="bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700">
 
-            + Ajouter un utilisateur
+<div>
 
-        </button>
+<h2 class="text-3xl font-bold">
+Tableau de bord Administrateur
+</h2>
 
-    </div>
 
-    <!-- STATISTIQUES -->
-    <div class="grid md:grid-cols-5 gap-6 mb-8">
+<p class="text-gray-500">
+Gestion de la plateforme E-Learning Offline
+</p>
 
-        <div class="bg-white p-6 rounded-xl shadow">
-            <p class="text-gray-500">Utilisateurs</p>
-            <h3 class="text-3xl font-bold text-blue-600">120</h3>
-        </div>
 
-        <div class="bg-white p-6 rounded-xl shadow">
-            <p class="text-gray-500">Étudiants</p>
-            <h3 class="text-3xl font-bold text-cyan-600">108</h3>
-        </div>
+</div>
 
-        <div class="bg-white p-6 rounded-xl shadow">
-            <p class="text-gray-500">Professeurs</p>
-            <h3 class="text-3xl font-bold text-orange-600">12</h3>
-        </div>
 
-        <div class="bg-white p-6 rounded-xl shadow">
-            <p class="text-gray-500">Cours</p>
-            <h3 class="text-3xl font-bold text-green-600">45</h3>
-        </div>
+</div>
 
-        <div class="bg-white p-6 rounded-xl shadow">
-            <p class="text-gray-500">Quiz</p>
-            <h3 class="text-3xl font-bold text-purple-600">30</h3>
-        </div>
 
-    </div>
 
-    <!-- UTILISATEURS -->
-    <section id="utilisateurs">
 
-        <div class="bg-white rounded-xl shadow p-6">
 
-            <div class="flex justify-between items-center mb-4">
+<!-- STATUT RESEAU -->
 
-                <h3 class="text-xl font-bold">
-                    👥 Gestion des utilisateurs
-                </h3>
+<div class="mb-6">
 
-            </div>
+Statut réseau :
 
-            <input
-                type="text"
-                placeholder="Rechercher un utilisateur..."
-                class="w-full border rounded-lg p-3 mb-6"
-            >
+<span id="network-status"
+class="font-semibold">
+...
+</span>
 
-            <div class="overflow-x-auto">
 
-                <table class="w-full">
+</div>
 
-                    <thead>
 
-                        <tr class="border-b text-left">
 
-                            <th class="p-3">Nom</th>
-                            <th class="p-3">Email</th>
-                            <th class="p-3">Rôle</th>
-                            <th class="p-3">Statut</th>
-                            <th class="p-3">Actions</th>
 
-                        </tr>
 
-                    </thead>
 
-                    <tbody id="usersTable">
+<!-- ================= STATISTIQUES ================= -->
 
-                        <tr class="border-b hover:bg-gray-50">
 
-                            <td class="p-3">Awa Ndiaye</td>
-                            <td class="p-3">awa@gmail.com</td>
-                            <td class="p-3">Étudiant</td>
+<div class="grid md:grid-cols-5 gap-6 mb-8">
 
-                            <td class="p-3">
-                                <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
-                                    Actif
-                                </span>
-                            </td>
 
-                            <td class="p-3">
-                                <button onclick="editUser('Awa Ndiaye')" class="text-blue-600 mr-3">
-                                    Modifier
-                                </button>
 
-                                <button onclick="deleteUser('Awa Ndiaye')" class="text-red-600">
-                                    Supprimer
-                                </button>
-                            </td>
+<div class="bg-white p-6 rounded-xl shadow">
 
-                        </tr>
+<p class="text-gray-500">
+Utilisateurs
+</p>
 
-                        <tr class="border-b hover:bg-gray-50">
+<h3 id="statUsers"
+class="text-3xl font-bold text-blue-600">
+--
+</h3>
 
-                            <td class="p-3">Mamadou Fall</td>
-                            <td class="p-3">mamadou@gmail.com</td>
-                            <td class="p-3">Professeur</td>
+</div>
 
-                            <td class="p-3">
-                                <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
-                                    Actif
-                                </span>
-                            </td>
 
-                            <td class="p-3">
-                                <button onclick="editUser('Mamadou Fall')" class="text-blue-600 mr-3">
-                                    Modifier
-                                </button>
 
-                                <button onclick="deleteUser('Mamadou Fall')" class="text-red-600">
-                                    Supprimer
-                                </button>
-                            </td>
 
-                        </tr>
+<div class="bg-white p-6 rounded-xl shadow">
 
-                    </tbody>
+<p class="text-gray-500">
+Cours
+</p>
 
-                </table>
+<h3 id="statCours"
+class="text-3xl font-bold text-green-600">
+--
+</h3>
 
-            </div>
+</div>
 
-        </div>
 
-    </section>
+
+
+
+<div class="bg-white p-6 rounded-xl shadow">
+
+<p class="text-gray-500">
+Synchronisation
+</p>
+
+<h3 id="statSync"
+class="text-3xl font-bold text-orange-500">
+--
+</h3>
+
+</div>
+
+
+
+
+
+<div class="bg-white p-6 rounded-xl shadow">
+
+<p class="text-gray-500">
+Professeurs
+</p>
+
+<h3 class="text-3xl font-bold text-purple-600">
+--
+</h3>
+
+</div>
+
+
+
+
+
+<div class="bg-white p-6 rounded-xl shadow">
+
+<p class="text-gray-500">
+Quiz
+</p>
+
+<h3 class="text-3xl font-bold text-red-500">
+--
+</h3>
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+<!-- ================= SYNCHRONISATION ================= -->
+
+
+<div class="bg-white rounded-xl shadow p-6 mb-8">
+
+
+<h3 class="text-xl font-bold mb-4">
+☁️ Synchronisation Cloud
+</h3>
+
+
+
+<button onclick="lancerSync()"
+class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700">
+
+🔄 Lancer synchronisation
+
+</button>
+
+
+<p id="syncMsg"
+class="mt-3 text-gray-500">
+
+</p>
+
+
+</div>
+
+
+
+
+
+
+
+
+<!-- ================= CREATION USER ================= -->
+
+
+<div class="bg-white rounded-xl shadow p-6 mb-8">
+
+
+<h3 class="text-xl font-bold mb-4">
+
+➕ Ajouter un utilisateur
+
+</h3>
+
+
+
+<div class="grid md:grid-cols-2 gap-4">
+
+
+<input id="newNom"
+class="border p-3 rounded-lg"
+placeholder="Nom complet">
+
+
+
+<input id="newEmail"
+class="border p-3 rounded-lg"
+placeholder="Email">
+
+
+
+<input id="newPass"
+type="password"
+class="border p-3 rounded-lg"
+placeholder="Mot de passe">
+
+
+
+<select id="newRole"
+class="border p-3 rounded-lg">
+
+
+<option value="eleve">
+Élève
+</option>
+
+
+<option value="professeur">
+Professeur
+</option>
+
+
+<option value="admin">
+Administrateur
+</option>
+
+
+</select>
+
+
+
+</div>
+
+
+
+
+<button onclick="ajouterUser()"
+class="mt-5 bg-blue-600 text-white px-5 py-3 rounded-lg">
+
+
+Créer le compte
+
+
+</button>
+
+
+
+<p id="userFormMsg"
+class="mt-3">
+
+</p>
+
+
+</div>
+
+
+
+
+
+
+
+
+<!-- ================= TABLE USERS ================= -->
+
+
+
+<div class="bg-white rounded-xl shadow p-6">
+
+
+<h3 class="text-xl font-bold mb-4">
+
+👥 Gestion des utilisateurs
+
+</h3>
+
+
+
+<table class="w-full">
+
+
+<thead>
+
+
+<tr class="border-b text-left">
+
+
+<th class="p-3">
+Nom
+</th>
+
+
+<th class="p-3">
+Email
+</th>
+
+
+<th class="p-3">
+Rôle
+</th>
+
+
+<th class="p-3">
+Actions
+</th>
+
+
+</tr>
+
+
+</thead>
+
+
+
+<tbody id="usersTable">
+
+
+<tr>
+
+<td colspan="4"
+class="p-3 text-center text-gray-400">
+
+Chargement...
+
+</td>
+
+</tr>
+
+
+</tbody>
+
+
+
+</table>
+
+
+</div>
+
+
+
 
 </main>
 
-</div>
-
-<!-- MODAL -->
-<div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-
-    <div class="bg-white p-6 rounded-lg w-96">
-
-        <h2 class="text-xl font-bold mb-4">Ajouter utilisateur</h2>
-
-        <input class="w-full border p-2 mb-2" placeholder="Nom">
-        <input class="w-full border p-2 mb-2" placeholder="Email">
-
-        <select class="w-full border p-2 mb-4">
-            <option>Étudiant</option>
-            <option>Professeur</option>
-        </select>
-
-        <div class="flex justify-end gap-2">
-
-            <button onclick="closeModal()" class="px-4 py-2 bg-gray-300 rounded">
-                Annuler
-            </button>
-
-            <button class="px-4 py-2 bg-blue-600 text-white rounded">
-                Ajouter
-            </button>
-
-        </div>
-
-    </div>
 
 </div>
 
-<!-- JS -->
-<script>
 
-function openModal() {
-    document.getElementById("modal").classList.remove("hidden");
-}
 
-function closeModal() {
-    document.getElementById("modal").classList.add("hidden");
-}
 
-function editUser(name) {
-    alert("Modifier utilisateur : " + name);
-}
 
-function deleteUser(name) {
-    if(confirm("Supprimer " + name + " ?")) {
-        alert("Utilisateur supprimé (simulation)");
-    }
-}
-window.onclick = function(event) {
-    let modal = document.getElementById("modal");
-    if (event.target === modal) {
-        closeModal();
-    }
-}
- if (localStorage.getItem("role") !== "admin") {
-        window.location.href = "index.html";
-    }
-requireAuth(); 
-</script>
+
+<!-- ================= SCRIPTS ================= -->
+
+
 <script src="js/api.js"></script>
+
+
 <script>
-async function loadUsers() {
 
-    try {
-        const users = await getUsers();
-        const table = document.getElementById("usersTable");
 
-        table.innerHTML = "";
+requireAuth();
 
-        users.forEach(user => {
 
-            table.innerHTML += `
-                <tr class="border-b hover:bg-gray-50">
 
-                    <td class="p-3">${user.nom || user.name}</td>
-                    <td class="p-3">${user.email}</td>
-                    <td class="p-3">${user.role}</td>
+if(localStorage.getItem("role") !== "admin"){
 
-                    <td class="p-3">
-                        <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
-                            Actif
-                        </span>
-                    </td>
+window.location.href="index.html";
 
-                    <td class="p-3">
-                        <button onclick="editUser('${user.nom || user.name}')" class="text-blue-600 mr-3">
-                            Modifier
-                        </button>
-
-                        <button onclick="deleteUser('${user.id}')" class="text-red-600">
-                            Supprimer
-                        </button>
-                    </td>
-
-                </tr>
-            `;
-        });
-
-    } catch (error) {
-        console.error("Erreur chargement users:", error);
-    }
 }
 
-// lancer au chargement
-window.onload = function () {
-    loadUsers();
-};
+
+
+
+
+async function loadDashboard(){
+
+
+try{
+
+
+const users = await getUsers();
+
+
+document.getElementById("statUsers").innerText =
+users.length;
+
+
+
+const cours = await getCours();
+
+
+document.getElementById("statCours").innerText =
+cours.length;
+
+
+
+const sync = await getSyncStatus();
+
+
+document.getElementById("statSync").innerText =
+sync.en_attente_sync || 0;
+
+
+
+
+const tbody =
+document.getElementById("usersTable");
+
+
+
+tbody.innerHTML="";
+
+
+
+users.forEach(user=>{
+
+
+tbody.innerHTML += `
+
+<tr class="border-b hover:bg-gray-50">
+
+
+<td class="p-3">
+${user.nom}
+</td>
+
+
+<td class="p-3">
+${user.email}
+</td>
+
+
+<td class="p-3">
+${user.role}
+</td>
+
+
+<td class="p-3">
+
+
+<button
+onclick="supprimerUser(${user.id}, '${user.nom}')"
+class="text-red-600">
+
+Supprimer
+
+</button>
+
+
+</td>
+
+
+</tr>
+
+`;
+
+
+});
+
+
+
+}
+
+catch(error){
+
+console.error(error);
+
+}
+
+
+}
+
+
+
+
+
+
+
+async function ajouterUser(){
+
+
+const nom =
+document.getElementById("newNom").value;
+
+
+const email =
+document.getElementById("newEmail").value;
+
+
+const pass =
+document.getElementById("newPass").value;
+
+
+const role =
+document.getElementById("newRole").value;
+
+
+
+try{
+
+
+await createUser(
+nom,
+email,
+pass,
+role
+);
+
+
+
+document.getElementById("userFormMsg").innerHTML =
+"✅ Utilisateur créé";
+
+
+
+loadDashboard();
+
+
+
+}
+
+catch(e){
+
+
+document.getElementById("userFormMsg").innerHTML =
+"❌ "+e.message;
+
+
+}
+
+
+}
+
+
+
+
+
+
+
+async function supprimerUser(id,nom){
+
+
+if(confirm("Supprimer "+nom+" ?")){
+
+
+await deleteUser(id);
+
+
+loadDashboard();
+
+
+}
+
+
+}
+
+
+
+
+
+
+
+
+async function lancerSync(){
+
+
+const msg =
+document.getElementById("syncMsg");
+
+
+
+msg.innerText =
+"Synchronisation en cours...";
+
+
+
+try{
+
+
+const res =
+await syncData();
+
+
+
+msg.innerText =
+"✅ Synchronisation terminée";
+
+
+loadDashboard();
+
+
+}
+
+
+catch{
+
+
+msg.innerText =
+"❌ Erreur synchronisation";
+
+
+}
+
+
+}
+
+
+
+
+
+
+// réseau
+
+function updateNetwork(){
+
+
+const status =
+document.getElementById("network-status");
+
+
+
+if(navigator.onLine){
+
+status.innerHTML =
+"🟢 En ligne";
+
+
+}
+
+else{
+
+
+status.innerHTML =
+"🔴 Hors connexion";
+
+
+}
+
+
+}
+
+
+
+window.addEventListener(
+"online",
+updateNetwork
+);
+
+
+window.addEventListener(
+"offline",
+updateNetwork
+);
+
+
+
+updateNetwork();
+
+
+loadDashboard();
+
+
+
 </script>
+
+
 </body>
+
 </html>
