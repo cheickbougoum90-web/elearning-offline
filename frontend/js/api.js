@@ -3,7 +3,7 @@
 // En local : http://localhost:8000
 // Sur AWS  : changer par l'IP EC2
 // ============================================================
-const API_URL = "http://localhost:8000";
+const API_URL = "";
 
 // ======================
 // TOKEN
