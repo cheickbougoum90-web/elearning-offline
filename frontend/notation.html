@@ -4,57 +4,99 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Notation du cours</title>
-
 <script src="https://cdn.tailwindcss.com"></script>
-
 </head>
-
 <body class="bg-gradient-to-br from-blue-50 via-white to-blue-100 min-h-screen">
-
 <header class="bg-white shadow-sm">
-
-<div class="max-w-5xl mx-auto p-4">
-<h1 class="text-xl font-bold text-blue-600">
-⭐ Évaluation du cours
-</h1>
-</div>
-
+    <div class="max-w-5xl mx-auto p-4">
+        <h1 class="text-xl font-bold text-blue-600">⭐ Évaluation du cours</h1>
+    </div>
 </header>
-
 <main class="max-w-3xl mx-auto p-6">
+    <div class="bg-white rounded-2xl shadow p-8">
+        <h2 id="coursTitreNotation" class="text-2xl font-bold mb-2">Évaluation</h2>
+        <p class="text-gray-500 text-sm mb-6">
+            Vous devez avoir terminé toutes les leçons pour pouvoir noter ce cours.
+        </p>
 
-<div class="bg-white rounded-2xl shadow p-8">
+        <!-- ÉTOILES -->
+        <div class="flex justify-center gap-3 mb-8" id="etoiles">
+            <span onclick="setNote(1)" class="etoile text-5xl cursor-pointer transition hover:scale-110">☆</span>
+            <span onclick="setNote(2)" class="etoile text-5xl cursor-pointer transition hover:scale-110">☆</span>
+            <span onclick="setNote(3)" class="etoile text-5xl cursor-pointer transition hover:scale-110">☆</span>
+            <span onclick="setNote(4)" class="etoile text-5xl cursor-pointer transition hover:scale-110">☆</span>
+            <span onclick="setNote(5)" class="etoile text-5xl cursor-pointer transition hover:scale-110">☆</span>
+        </div>
+        <p id="noteTexte" class="text-center text-gray-400 mb-4 text-sm">Cliquez sur une étoile</p>
 
-<h2 class="text-2xl font-bold mb-6">
-Comment avez-vous trouvé ce cours ?
-</h2>
+        <textarea id="commentaire"
+            class="w-full border rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            rows="4"
+            placeholder="Votre commentaire sur le cours..."></textarea>
 
-<div class="flex justify-center text-5xl gap-3 mb-8">
-
-<span class="cursor-pointer">⭐</span>
-<span class="cursor-pointer">⭐</span>
-<span class="cursor-pointer">⭐</span>
-<span class="cursor-pointer">⭐</span>
-<span class="cursor-pointer">⭐</span>
-
-</div>
-
-<textarea
-class="w-full border rounded-xl p-4"
-rows="5"
-placeholder="Votre commentaire..."
-></textarea>
-
-<button
-class="mt-6 bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700">
-
-Envoyer l'évaluation
-
-</button>
-
-</div>
-
+        <button onclick="envoyerAvis()"
+            class="mt-6 w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 font-semibold">
+            Envoyer l'évaluation
+        </button>
+        <p id="avisMsg" class="mt-3 text-sm text-center hidden"></p>
+    </div>
 </main>
 
+<script src="js/api.js"></script>
+<script>
+requireAuth();
+
+const params  = new URLSearchParams(window.location.search);
+const coursId = params.get("cours_id");
+const coursTitre = params.get("cours_titre");
+let noteChoisie = 0;
+
+if (coursTitre) {
+    document.getElementById("coursTitreNotation").innerText =
+        "⭐ Évaluation : " + decodeURIComponent(coursTitre);
+}
+
+const labels = ["", "Très mauvais", "Mauvais", "Moyen", "Bien", "Excellent !"];
+
+function setNote(n) {
+    noteChoisie = n;
+    const etoiles = document.querySelectorAll(".etoile");
+    etoiles.forEach((e, i) => {
+        e.innerText = i < n ? "★" : "☆";
+        e.style.color = i < n ? "#f59e0b" : "#9ca3af";
+    });
+    document.getElementById("noteTexte").innerText = labels[n];
+}
+
+async function envoyerAvis() {
+    const commentaire = document.getElementById("commentaire").value.trim();
+    const msg = document.getElementById("avisMsg");
+
+    if (noteChoisie === 0) {
+        msg.innerText = "❌ Veuillez sélectionner une note.";
+        msg.className = "mt-3 text-sm text-center text-red-500";
+        msg.classList.remove("hidden");
+        return;
+    }
+    if (!commentaire) {
+        msg.innerText = "❌ Le commentaire est obligatoire.";
+        msg.className = "mt-3 text-sm text-center text-red-500";
+        msg.classList.remove("hidden");
+        return;
+    }
+
+    try {
+        await postAvis(parseInt(coursId), noteChoisie, commentaire);
+        msg.innerText = "✅ Merci pour votre évaluation !";
+        msg.className = "mt-3 text-sm text-center text-green-600";
+        msg.classList.remove("hidden");
+        setTimeout(() => window.location.href = "cours.html", 2000);
+    } catch(e) {
+        msg.innerText = "❌ " + e.message;
+        msg.className = "mt-3 text-sm text-center text-red-500";
+        msg.classList.remove("hidden");
+    }
+}
+</script>
 </body>
 </html>

@@ -1,3 +1,4 @@
+requireAuth();
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -248,4 +249,13 @@
 
 </body>
 
-</html>
+</html><script src="js/api.js"></script>
+<script>
+requireAuth();
+const nom = localStorage.getItem("nom");
+if (nom) {
+    document.querySelector("h2").innerText = "Bienvenue " + nom + " 👋";
+}
+const role = localStorage.getItem("role");
+if (role === "eleve") window.location.href = "eleve.html";
+</script>
