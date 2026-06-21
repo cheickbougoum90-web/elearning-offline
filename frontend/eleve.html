@@ -88,20 +88,25 @@ async function loadDashboardStats() {
     const userId = localStorage.getItem("user_id");
     try {
         const cours = await getCours();
-        document.getElementById("statCoursSuivis").innerText = cours.length;
 
-        // Agréger les stats sur tous les cours
+        let coursSuivis = 0;
         let totalTerminees = 0;
         let totalScores = [];
 
         for (const c of cours) {
             try {
                 const stats = await getStats(userId, c.id);
+
+                if (stats.lecons_terminees > 0) {
+                    coursSuivis++;
+                }
+
                 totalTerminees += stats.lecons_terminees;
                 if (stats.score_moyen > 0) totalScores.push(stats.score_moyen);
             } catch(e) {}
         }
 
+        document.getElementById("statCoursSuivis").innerText = coursSuivis;
         document.getElementById("statLeconsTerminees").innerText = totalTerminees;
 
         const moyenne = totalScores.length

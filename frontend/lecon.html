@@ -141,7 +141,7 @@ async function marquerTermine() {
     if (!leconActive) return;
     const msg = document.getElementById("actionMsg");
     try {
-        await saveProgression(leconActive.id, "termine", 100);
+        await saveProgression(leconActive.id, "termine", 0);
         msg.innerText = "✅ Leçon marquée comme terminée !";
         msg.className = "mt-3 text-sm text-green-600";
         await updateProgressBar();
