@@ -54,3 +54,30 @@ async function login() {
         btn.disabled  = false;
     }
 }
+async function loginUser(email, password) {
+
+    try {
+        const data = await apiLogin(email, password);
+
+        const role = data.role || localStorage.getItem("role");
+
+        if (role === "etudiant") {
+            window.location.href = "eleve.html";
+        }
+
+        else if (role === "professeur") {
+            window.location.href = "prof.html";
+        }
+
+        else if (role === "admin") {
+            window.location.href = "admin.html";
+        }
+
+        else {
+            alert("Rôle inconnu");
+        }
+
+    } catch (error) {
+        alert("Erreur login: " + error.message);
+    }
+}
