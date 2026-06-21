@@ -9,7 +9,10 @@
 <body class="bg-gradient-to-br from-blue-50 via-white to-blue-100 min-h-screen">
 
 <header class="bg-white shadow p-4 flex justify-between items-center">
-    <h1 class="text-blue-600 font-bold text-lg">📚 Cours</h1>
+    <div class="flex items-center gap-4">
+        <a href="eleve.html" id="backLink" class="text-gray-500 hover:text-blue-600 text-sm">← Retour</a>
+        <h1 class="text-blue-600 font-bold text-lg">📚 Cours</h1>
+    </div>
     <div class="flex items-center gap-4">
         <span id="nomUser" class="text-gray-600 text-sm"></span>
         <button id="addBtn"
@@ -58,11 +61,14 @@ const userName = localStorage.getItem("nom");
 
 document.getElementById("nomUser").innerText = userName || "";
 
+// Lien retour adapté au rôle
+if (userRole === "professeur") document.getElementById("backLink").href = "prof.html";
+if (userRole === "admin")      document.getElementById("backLink").href = "admin.html";
+
 if (userRole === "professeur" || userRole === "admin") {
     document.getElementById("addBtn").classList.remove("hidden");
 }
 
-// Charger les cours depuis le backend
 async function loadCours() {
     const list = document.getElementById("coursList");
     try {
@@ -81,11 +87,17 @@ async function loadCours() {
                     <span class="text-yellow-500 text-sm">★ ${c.moyenne_notes.toFixed(1)}</span>
                 </div>
                 <p class="text-gray-500 text-sm">${c.description || "Pas de description"}</p>
+                <p class="text-gray-400 text-xs mt-2">👨‍🏫 ${c.prof_nom || "Professeur inconnu"}</p>
                 <div class="flex justify-between items-center mt-4">
                     <a href="lecon.html?cours_id=${c.id}&cours_titre=${encodeURIComponent(c.titre)}"
-                        class="text-blue-600 font-semibold hover:underline">
+                        class="text-blue-600 font-semibold hover:underline text-sm">
                         Ouvrir →
                     </a>
+                    ${userRole === 'eleve' ? `
+                    <a href="notation.html?cours_id=${c.id}&cours_titre=${encodeURIComponent(c.titre)}"
+                        class="text-yellow-600 text-sm hover:underline">
+                        ⭐ Noter
+                    </a>` : ''}
                     ${(userRole === 'professeur' || userRole === 'admin') ? `
                     <div class="flex gap-2">
                         <button onclick="supprimerCours(${c.id})"
@@ -123,7 +135,7 @@ async function submitCours() {
         document.getElementById("newTitre").value = "";
         document.getElementById("newDesc").value  = "";
         err.classList.add("hidden");
-        loadCours(); // recharger la liste
+        loadCours();
     } catch(e) {
         err.innerText = e.message;
         err.classList.remove("hidden");

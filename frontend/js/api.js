@@ -146,14 +146,6 @@ async function saveProgression(leconId, statut, score) {
     return await res.json();
 }
 
-async function getStats(userId, coursId) {
-    const res = await fetch(
-        `${API_URL}/api/progression/${userId}/stats?cours_id=${coursId}`,
-        { headers: authHeaders() }
-    );
-    return await res.json();
-}
-
 // ============================================================
 // AVIS
 // ============================================================
@@ -227,4 +219,26 @@ async function getSyncStatus() {
         headers: authHeaders()
     });
     return await res.json();
+}
+
+// ============================================================
+// STATS (ajout — manquait dans api.js)
+// ============================================================
+async function getStats(userId, coursId) {
+    const res = await fetch(
+        `${API_URL}/api/progression/${userId}/stats?cours_id=${coursId}`,
+        { headers: authHeaders() }
+    );
+    return handleResponse(res);
+}
+
+// ======================
+// ERREUR CENTRALISÉE (réajoutée — avait été supprimée par erreur)
+// ======================
+async function handleResponse(res) {
+    if (!res.ok) {
+        const error = await res.json().catch(() => ({}));
+        throw new Error(error.detail || "Erreur serveur");
+    }
+    return res.json();
 }
