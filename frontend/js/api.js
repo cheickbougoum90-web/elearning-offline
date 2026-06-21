@@ -202,13 +202,3 @@ async function getStats(userId, coursId) {
     return handleResponse(res);
 }
 
-// ======================
-// ERREUR CENTRALISÉE (réajoutée — avait été supprimée par erreur)
-// ======================
-async function handleResponse(res) {
-    if (!res.ok) {
-        const error = await res.json().catch(() => ({}));
-        throw new Error(error.detail || "Erreur serveur");
-    }
-    return res.json();
-}
