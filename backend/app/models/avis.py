@@ -10,7 +10,7 @@ class Avis(Base):
     user_id     = Column(Integer, ForeignKey("utilisateurs.id"), nullable=False)
     cours_id    = Column(Integer, ForeignKey("cours.id"), nullable=False)
     note        = Column(SmallInteger, nullable=False)
-    commentaire = Column(Text, nullable=False)
+    commentaire = Column(Text, nullable=True)
     created_at  = Column(DateTime(timezone=True), server_default=func.now())
 
     # Un élève ne peut noter un cours qu'une seule fois

@@ -1,14 +1,11 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard Élève</title>
-
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="css/style.css">
-
 <style>
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(15px); }
@@ -19,128 +16,116 @@
     animation: fadeIn 0.6s ease-out;
 }
 </style>
-
 </head>
-
 <body class="bg-gradient-to-br from-blue-50 via-white to-blue-100 min-h-screen">
 
-<!-- NAVBAR -->
 <header class="bg-white shadow-sm sticky top-0 z-10">
     <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-
-        <h1 class="text-xl font-bold text-blue-600">
-            🎓 E-learning
-        </h1>
-
-        <nav class="flex gap-6 text-gray-600 font-medium">
-            <a href="#" class="hover:text-blue-600">Dashboard</a>
+        <h1 class="text-xl font-bold text-blue-600">🎓 E-learning</h1>
+        <nav class="flex gap-6 text-gray-600 font-medium items-center">
+            <a href="eleve.html" class="hover:text-blue-600">Dashboard</a>
             <a href="cours.html" class="hover:text-blue-600">Cours</a>
-            <a href="quiz.html" class="hover:text-blue-600">Quiz</a>
             <a href="classement.html" class="hover:text-blue-600">Classement</a>
+            <button onclick="logout()" class="text-red-500 text-sm hover:underline">Déconnexion</button>
         </nav>
-
     </div>
 </header>
 
-<!-- CONTENU -->
 <main class="max-w-6xl mx-auto p-6 fade-in">
-
-    <!-- HEADER -->
     <div class="mb-8">
-        <h2 class="text-2xl font-bold text-gray-800">
-            Bienvenue 👋
-        </h2>
-        <p class="text-gray-500">
-            Voici ton espace d’apprentissage
-        </p>
+        <h2 class="text-2xl font-bold text-gray-800">Bienvenue 👋</h2>
+        <p class="text-gray-500">Voici ton espace d'apprentissage</p>
     </div>
 
-    <!-- GRID CARDS -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-        <!-- COURS -->
-        <a href="cours.html"
-           class="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition transform hover:-translate-y-1">
-
+        <a href="cours.html" class="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition transform hover:-translate-y-1">
             <div class="text-4xl mb-3">📚</div>
             <h3 class="text-lg font-bold text-gray-800">Cours</h3>
-            <p class="text-gray-500 text-sm mt-1">
-                Accède à tes cours et leçons
-            </p>
-
-            <div class="mt-4 text-blue-600 font-semibold">
-                Accéder →
-            </div>
-
+            <p class="text-gray-500 text-sm mt-1">Accède à tes cours et leçons</p>
+            <div class="mt-4 text-blue-600 font-semibold">Accéder →</div>
         </a>
 
-        <!-- QUIZ -->
-        <a href="quiz.html"
-           class="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition transform hover:-translate-y-1">
-
+        <a href="cours.html" class="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition transform hover:-translate-y-1">
             <div class="text-4xl mb-3">🧠</div>
             <h3 class="text-lg font-bold text-gray-800">Quiz</h3>
-            <p class="text-gray-500 text-sm mt-1">
-                Teste tes connaissances
-            </p>
-
-            <div class="mt-4 text-blue-600 font-semibold">
-                Commencer →
-            </div>
-
+            <p class="text-gray-500 text-sm mt-1">Ouvre un cours pour accéder à ses quiz</p>
+            <div class="mt-4 text-blue-600 font-semibold">Commencer →</div>
         </a>
 
-        <!-- CLASSEMENT -->
-        <a href="classement.html"
-           class="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition transform hover:-translate-y-1">
-
+        <a href="classement.html" class="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition transform hover:-translate-y-1">
             <div class="text-4xl mb-3">🏆</div>
             <h3 class="text-lg font-bold text-gray-800">Classement</h3>
-            <p class="text-gray-500 text-sm mt-1">
-                Voir les meilleurs étudiants
-            </p>
-
-            <div class="mt-4 text-blue-600 font-semibold">
-                Voir →
-            </div>
-
+            <p class="text-gray-500 text-sm mt-1">Voir les meilleurs professeurs</p>
+            <div class="mt-4 text-blue-600 font-semibold">Voir →</div>
         </a>
-
     </div>
 
-    <!-- STAT SECTION -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
-
         <div class="bg-white p-5 rounded-xl shadow text-center">
             <p class="text-gray-500 text-sm">Cours suivis</p>
-            <h3 class="text-2xl font-bold text-blue-600">12</h3>
+            <h3 id="statCoursSuivis" class="text-2xl font-bold text-blue-600">—</h3>
         </div>
-
         <div class="bg-white p-5 rounded-xl shadow text-center">
-            <p class="text-gray-500 text-sm">Quiz réussis</p>
-            <h3 class="text-2xl font-bold text-green-600">8</h3>
+            <p class="text-gray-500 text-sm">Leçons terminées</p>
+            <h3 id="statLeconsTerminees" class="text-2xl font-bold text-green-600">—</h3>
         </div>
-
         <div class="bg-white p-5 rounded-xl shadow text-center">
-            <p class="text-gray-500 text-sm">Classement</p>
-            <h3 class="text-2xl font-bold text-purple-600">#3</h3>
+            <p class="text-gray-500 text-sm">Score moyen</p>
+            <h3 id="statScoreMoyen" class="text-2xl font-bold text-purple-600">—</h3>
         </div>
-
     </div>
-
 </main>
 
-</body>
-</html><script src="js/api.js"></script>
+<script src="js/api.js"></script>
 <script>
 requireAuth();
-// Afficher le nom de l'utilisateur
+
 const nom = localStorage.getItem("nom");
 if (nom) {
     document.querySelector("h2").innerText = "Bienvenue " + nom + " 👋";
 }
-// Si l'utilisateur n'est pas élève, rediriger
+
 const role = localStorage.getItem("role");
 if (role === "professeur") window.location.href = "prof.html";
 if (role === "admin")      window.location.href = "admin.html";
+
+// Charger les vraies statistiques de l'élève
+async function loadDashboardStats() {
+    const userId = localStorage.getItem("user_id");
+    try {
+        const cours = await getCours();
+
+        let coursSuivis = 0;
+        let totalTerminees = 0;
+        let totalScores = [];
+
+        for (const c of cours) {
+            try {
+                const stats = await getStats(userId, c.id);
+
+                if (stats.lecons_terminees > 0) {
+                    coursSuivis++;
+                }
+
+                totalTerminees += stats.lecons_terminees;
+                if (stats.score_moyen > 0) totalScores.push(stats.score_moyen);
+            } catch(e) {}
+        }
+
+        document.getElementById("statCoursSuivis").innerText = coursSuivis;
+        document.getElementById("statLeconsTerminees").innerText = totalTerminees;
+
+        const moyenne = totalScores.length
+            ? Math.round(totalScores.reduce((a,b) => a+b, 0) / totalScores.length)
+            : 0;
+        document.getElementById("statScoreMoyen").innerText = moyenne + "%";
+
+    } catch(e) {
+        console.error("Erreur chargement stats:", e);
+    }
+}
+
+loadDashboardStats();
 </script>
+</body>
+</html>

@@ -16,6 +16,7 @@ class CoursUpdate(BaseModel):
 class CoursResponse(CoursBase):
     id: int
     prof_id: int
+    prof_nom: Optional[str] = None
     moyenne_notes: float
     created_at: datetime
 

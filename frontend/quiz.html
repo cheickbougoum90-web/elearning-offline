@@ -125,10 +125,18 @@ async function validerReponse(quizId) {
     }
 }
 
-function afficherResultatFinal() {
+async function afficherResultatFinal() {
     const container = document.getElementById("quizContainer");
     const pct = Math.round((score / quizData.length) * 100);
     const emoji = pct >= 80 ? "🎉" : pct >= 50 ? "👍" : "💪";
+
+    // Enregistrer la progression avec le VRAI score du quiz
+    try {
+        await saveProgression(parseInt(leconId), "termine", pct);
+    } catch(e) {
+        console.error("Erreur sauvegarde progression:", e);
+    }
+
     container.innerHTML = `
         <div class="bg-white rounded-2xl shadow p-8 text-center">
             <div class="text-6xl mb-4">${emoji}</div>

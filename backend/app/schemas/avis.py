@@ -5,7 +5,7 @@ from datetime import datetime
 class AvisCreate(BaseModel):
     cours_id: int
     note: int
-    commentaire: str
+    commentaire: Optional[str] = None
 
     @validator("note")
     def note_valide(cls, v):
@@ -13,18 +13,12 @@ class AvisCreate(BaseModel):
             raise ValueError("La note doit être entre 1 et 5")
         return v
 
-    @validator("commentaire")
-    def commentaire_non_vide(cls, v):
-        if not v.strip():
-            raise ValueError("Le commentaire ne peut pas être vide")
-        return v
-
 class AvisResponse(BaseModel):
     id: int
     user_id: int
     cours_id: int
     note: int
-    commentaire: str
+    commentaire: Optional[str]
     created_at: datetime
 
     class Config:
