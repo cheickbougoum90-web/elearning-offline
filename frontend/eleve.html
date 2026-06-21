@@ -19,6 +19,12 @@
 </head>
 <body class="bg-gradient-to-br from-blue-50 via-white to-blue-100 min-h-screen">
 
+<!-- BANDEAU IMPERSONATION -->
+<div id="impersonationBanner" class="hidden bg-yellow-400 text-yellow-900 text-center py-2 text-sm font-semibold sticky top-0 z-50">
+    🎭 Vous naviguez en tant que <span id="impersonatedNom"></span> —
+    <button onclick="stopImpersonation()" class="underline hover:text-yellow-700 ml-2">Retour Admin</button>
+</div>
+
 <header class="bg-white shadow-sm sticky top-0 z-10">
     <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
         <h1 class="text-xl font-bold text-blue-600">🎓 E-learning</h1>
@@ -126,6 +132,11 @@ async function loadDashboardStats() {
 }
 
 loadDashboardStats();
+
+if (localStorage.getItem("impersonating") === "true") {
+    document.getElementById("impersonationBanner").classList.remove("hidden");
+    document.getElementById("impersonatedNom").innerText = nom;
+}
 </script>
 </body>
 </html>

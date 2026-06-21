@@ -11,27 +11,63 @@
 </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 via-white to-blue-100 min-h-screen">
+
+<div id="impersonationBanner" class="hidden bg-yellow-400 text-yellow-900 text-center py-2 text-sm font-semibold sticky top-0 z-50">
+    🎭 Vous naviguez en tant que <span id="impersonatedNom"></span> —
+    <button onclick="stopImpersonation()" class="underline hover:text-yellow-700 ml-2">Retour Admin</button>
+</div>
+
 <header class="bg-white shadow-sm">
-    <div class="max-w-6xl mx-auto p-4 flex justify-between items-center">
+    <div class="max-w-5xl mx-auto p-4 flex justify-between items-center">
         <h1 id="coursTitre" class="text-blue-600 font-bold text-xl">📚 Cours</h1>
-        <a href="cours.html" class="text-gray-600 hover:text-blue-600 text-sm">← Retour aux cours</a>
+        <a id="backLink" href="cours.html" class="text-gray-600 hover:text-blue-600 text-sm">← Retour aux cours</a>
     </div>
 </header>
 
 <main class="max-w-5xl mx-auto p-6 fade-in">
 
-    <!-- LISTE DES LEÇONS -->
+    <div id="addLeconWrapper" class="hidden mb-4 text-right">
+        <button onclick="toggleAddLeconForm()"
+            class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">
+            + Ajouter une leçon
+        </button>
+    </div>
+
+    <div id="leconForm" class="hidden bg-white rounded-2xl shadow p-6 mb-6">
+        <h3 class="font-bold text-lg mb-4" id="leconFormTitle">Nouvelle leçon</h3>
+        <input id="formLeconTitre" type="text" placeholder="Titre de la leçon"
+            class="w-full border p-3 rounded mb-3 focus:outline-none focus:ring-2 focus:ring-blue-400">
+        <textarea id="formLeconContenu" placeholder="Contenu de la leçon" rows="5"
+            class="w-full border p-3 rounded mb-3 focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
+        <input id="formLeconOrdre" type="number" placeholder="Ordre (1, 2, 3...)" min="1" value="1"
+            class="w-32 border p-3 rounded mb-3 focus:outline-none focus:ring-2 focus:ring-blue-400">
+        <div class="flex gap-3">
+            <button onclick="submitLecon()" class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700">
+                Enregistrer
+            </button>
+            <button onclick="toggleAddLeconForm()" class="text-gray-500 px-5 py-2 rounded border hover:bg-gray-50">
+                Annuler
+            </button>
+        </div>
+        <p id="leconFormError" class="text-red-500 text-sm mt-2 hidden"></p>
+        <input type="hidden" id="editingLeconId" value="">
+    </div>
+
     <div id="leconsList" class="space-y-4 mb-8">
         <div class="text-center text-gray-400 py-10">Chargement des leçons...</div>
     </div>
 
-    <!-- CONTENU LEÇON SÉLECTIONNÉE -->
     <div id="leconContent" class="hidden">
         <div class="bg-white rounded-2xl shadow p-6 mb-6">
-            <h2 id="leconTitre" class="text-2xl font-bold mb-4"></h2>
+            <div class="flex justify-between items-start mb-4">
+                <h2 id="leconTitre" class="text-2xl font-bold"></h2>
+                <div id="leconActionsProf" class="hidden flex gap-2 shrink-0">
+                    <button onclick="editerLecon()" class="text-blue-600 text-sm hover:underline">✏️ Modifier</button>
+                    <button onclick="supprimerLecon()" class="text-red-500 text-sm hover:underline">🗑️ Supprimer</button>
+                </div>
+            </div>
 
-            <!-- BARRE DE PROGRESSION -->
-            <div class="mb-6">
+            <div id="progressWrapper" class="mb-6">
                 <div class="flex justify-between text-sm text-gray-500 mb-1">
                     <span>Progression du cours</span>
                     <span id="progressPct">0%</span>
@@ -44,8 +80,45 @@
             <div id="leconTexte" class="text-gray-700 leading-8"></div>
         </div>
 
-        <!-- BOUTONS ACTION -->
-        <div class="flex gap-4 justify-between">
+        <div class="bg-white rounded-2xl shadow p-6 mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-lg">🧠 Quiz</h3>
+                <button id="btnAddQuiz" onclick="toggleAddQuizForm()"
+                    class="hidden bg-green-600 text-white px-3 py-1.5 rounded text-sm hover:bg-green-700">
+                    + Ajouter un quiz
+                </button>
+            </div>
+
+            <div id="quizExistant" class="text-gray-400 text-sm">Aucun quiz pour cette leçon.</div>
+
+            <div id="quizForm" class="hidden mt-4 border-t pt-4">
+                <input id="formQuizQuestion" type="text" placeholder="Question"
+                    class="w-full border p-3 rounded mb-3 focus:outline-none focus:ring-2 focus:ring-green-400">
+
+                <p class="text-sm text-gray-500 mb-2">
+                    Réponses — coche la case devant chaque BONNE réponse (une ou plusieurs possibles) :
+                </p>
+
+                <div id="reponsesForm" class="space-y-2 mb-3"></div>
+
+                <button onclick="ajouterChampReponse()"
+                    class="text-blue-600 text-sm hover:underline mb-3">
+                    + Ajouter une réponse
+                </button>
+
+                <div class="flex gap-3">
+                    <button onclick="submitQuiz()" class="bg-green-600 text-white px-5 py-2 rounded hover:bg-green-700">
+                        Créer le quiz
+                    </button>
+                    <button onclick="toggleAddQuizForm()" class="text-gray-500 px-5 py-2 rounded border hover:bg-gray-50">
+                        Annuler
+                    </button>
+                </div>
+                <p id="quizFormError" class="text-red-500 text-sm mt-2 hidden"></p>
+            </div>
+        </div>
+
+        <div id="eleveActions" class="hidden flex gap-4 justify-between">
             <button onclick="marquerTermine()"
                 class="bg-green-600 text-white px-6 py-3 rounded-xl hover:bg-green-700">
                 ✅ Marquer comme terminée
@@ -66,13 +139,49 @@ requireAuth();
 const params   = new URLSearchParams(window.location.search);
 const coursId  = params.get("cours_id");
 const coursTitre = params.get("cours_titre");
+const userRole = localStorage.getItem("role");
+const nom      = localStorage.getItem("nom");
 
 let leconActive = null;
 let toutesLecons = [];
+let estProf = false; // sera défini après vérification de la propriété du cours
+let compteurReponses = 0;
 
 if (coursTitre) {
     document.getElementById("coursTitre").innerText = "📚 " + decodeURIComponent(coursTitre);
 }
+
+if (userRole === "professeur") document.getElementById("backLink").href = "prof.html";
+if (userRole === "admin")      document.getElementById("backLink").href = "admin.html";
+
+async function initRolePage() {
+    const userId = localStorage.getItem("user_id");
+
+    if (userRole === "admin") {
+        estProf = true;
+    } else if (userRole === "professeur") {
+        try {
+            const tousLesCours = await getCours();
+            const ceCours = tousLesCours.find(c => c.id === parseInt(coursId));
+            estProf = ceCours && ceCours.prof_id === parseInt(userId);
+        } catch(e) {
+            estProf = false;
+        }
+    }
+
+    if (estProf) {
+        document.getElementById("addLeconWrapper").classList.remove("hidden");
+    } else {
+        document.getElementById("eleveActions").classList.remove("hidden");
+    }
+}
+
+if (localStorage.getItem("impersonating") === "true") {
+    document.getElementById("impersonationBanner").classList.remove("hidden");
+    document.getElementById("impersonatedNom").innerText = nom;
+}
+
+// ── LEÇONS ──────────────────────────────────────────────────────────────────
 
 async function loadLecons() {
     const container = document.getElementById("leconsList");
@@ -88,8 +197,7 @@ async function loadLecons() {
         }
         container.innerHTML = toutesLecons.map((l, i) => `
             <div onclick="ouvrirLecon(${l.id})"
-                class="bg-white p-4 rounded-xl shadow hover:shadow-md cursor-pointer flex justify-between items-center transition hover:-translate-y-0.5"
-                id="lecon-card-${l.id}">
+                class="bg-white p-4 rounded-xl shadow hover:shadow-md cursor-pointer flex justify-between items-center transition hover:-translate-y-0.5">
                 <div class="flex items-center gap-3">
                     <span class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-sm">
                         ${i + 1}
@@ -112,20 +220,86 @@ async function ouvrirLecon(id) {
     document.getElementById("leconTexte").innerText = leconActive.contenu || "Contenu en cours de rédaction.";
     document.getElementById("leconContent").classList.remove("hidden");
 
-    // Vérifier si un quiz existe
-    const quiz = await getQuiz(id);
-    if (quiz && quiz.length > 0) {
-        document.getElementById("btnQuiz").classList.remove("hidden");
+    if (estProf) {
+        document.getElementById("leconActionsProf").classList.remove("hidden");
+        document.getElementById("progressWrapper").classList.add("hidden");
+        document.getElementById("btnAddQuiz").classList.remove("hidden");
     } else {
-        document.getElementById("btnQuiz").classList.add("hidden");
+        await updateProgressBar();
     }
 
-    // Mettre à jour la progression affichée
-    await updateProgressBar();
+    await chargerQuiz(id);
 
-    // Scroll vers le contenu
     document.getElementById("leconContent").scrollIntoView({ behavior: "smooth" });
 }
+
+function editerLecon() {
+    document.getElementById("leconFormTitle").innerText = "Modifier la leçon";
+    document.getElementById("formLeconTitre").value = leconActive.titre;
+    document.getElementById("formLeconContenu").value = leconActive.contenu || "";
+    document.getElementById("formLeconOrdre").value = leconActive.ordre;
+    document.getElementById("editingLeconId").value = leconActive.id;
+    document.getElementById("leconForm").classList.remove("hidden");
+    document.getElementById("leconForm").scrollIntoView({ behavior: "smooth" });
+}
+
+async function supprimerLecon() {
+    if (!confirm(`Supprimer la leçon "${leconActive.titre}" ? Cette action est irréversible.`)) return;
+    try {
+        await deleteLecon(leconActive.id);
+        document.getElementById("leconContent").classList.add("hidden");
+        leconActive = null;
+        loadLecons();
+    } catch(e) {
+        alert("Erreur : " + e.message);
+    }
+}
+
+function toggleAddLeconForm() {
+    const form = document.getElementById("leconForm");
+    const isHidden = form.classList.contains("hidden");
+    if (isHidden) {
+        document.getElementById("leconFormTitle").innerText = "Nouvelle leçon";
+        document.getElementById("formLeconTitre").value = "";
+        document.getElementById("formLeconContenu").value = "";
+        document.getElementById("formLeconOrdre").value = toutesLecons.length + 1;
+        document.getElementById("editingLeconId").value = "";
+        form.classList.remove("hidden");
+    } else {
+        form.classList.add("hidden");
+    }
+}
+
+async function submitLecon() {
+    const titre   = document.getElementById("formLeconTitre").value.trim();
+    const contenu = document.getElementById("formLeconContenu").value.trim();
+    const ordre   = parseInt(document.getElementById("formLeconOrdre").value) || 1;
+    const editId  = document.getElementById("editingLeconId").value;
+    const err     = document.getElementById("leconFormError");
+
+    if (!titre) {
+        err.innerText = "Le titre est obligatoire";
+        err.classList.remove("hidden");
+        return;
+    }
+
+    try {
+        if (editId) {
+            await updateLecon(parseInt(editId), titre, contenu, ordre);
+        } else {
+            await createLecon(parseInt(coursId), titre, contenu, ordre);
+        }
+        document.getElementById("leconForm").classList.add("hidden");
+        document.getElementById("leconContent").classList.add("hidden");
+        err.classList.add("hidden");
+        loadLecons();
+    } catch(e) {
+        err.innerText = e.message;
+        err.classList.remove("hidden");
+    }
+}
+
+// ── PROGRESSION (élève) ───────────────────────────────────────────────────────
 
 async function updateProgressBar() {
     const userId = localStorage.getItem("user_id");
@@ -155,7 +329,147 @@ function allerQuiz() {
     window.location.href = `quiz.html?lecon_id=${leconActive.id}&lecon_titre=${encodeURIComponent(leconActive.titre)}`;
 }
 
-loadLecons();
+// ── QUIZ ──────────────────────────────────────────────────────────────────────
+
+async function chargerQuiz(leconId) {
+    const zone = document.getElementById("quizExistant");
+    try {
+        const quiz = await getQuiz(leconId);
+
+        if (!estProf) {
+            if (quiz && quiz.length > 0) {
+                document.getElementById("btnQuiz").classList.remove("hidden");
+            } else {
+                document.getElementById("btnQuiz").classList.add("hidden");
+            }
+            zone.classList.add("hidden");
+            return;
+        }
+
+        zone.classList.remove("hidden");
+        if (!quiz || quiz.length === 0) {
+            zone.innerHTML = `<p class="text-gray-400 text-sm">Aucun quiz pour cette leçon.</p>`;
+            return;
+        }
+
+        zone.innerHTML = quiz.map(q => `
+            <div class="border rounded-lg p-3 mb-2 flex justify-between items-start">
+                <div>
+                    <p class="font-medium">${q.question}</p>
+                    <ul class="text-sm text-gray-500 mt-1 list-disc ml-5">
+                        ${q.reponses.map(r => `<li class="${r.est_correcte ? 'text-green-600 font-semibold' : ''}">${r.texte}${r.est_correcte ? ' ✓' : ''}</li>`).join("")}
+                    </ul>
+                </div>
+                <button onclick="supprimerQuizExistant(${q.id})" class="text-red-500 text-sm hover:underline shrink-0 ml-3">
+                    Supprimer
+                </button>
+            </div>
+        `).join("");
+    } catch(e) {
+        zone.innerHTML = `<p class="text-red-400 text-sm">Erreur de chargement du quiz.</p>`;
+    }
+}
+
+function genererChampReponse(index) {
+    return `
+        <div class="flex items-center gap-2" id="reponse-row-${index}">
+            <input type="checkbox" class="reponse-correcte w-5 h-5" data-index="${index}">
+            <input type="text" placeholder="Réponse ${index + 1}" class="reponse-texte flex-1 border p-2 rounded" data-index="${index}">
+            <button type="button" onclick="retirerChampReponse(${index})" class="text-red-400 hover:text-red-600 text-sm px-2">✕</button>
+        </div>
+    `;
+}
+
+function ajouterChampReponse() {
+    const container = document.getElementById("reponsesForm");
+    container.insertAdjacentHTML("beforeend", genererChampReponse(compteurReponses));
+    compteurReponses++;
+}
+
+function retirerChampReponse(index) {
+    const row = document.getElementById(`reponse-row-${index}`);
+    const total = document.querySelectorAll("#reponsesForm > div").length;
+    if (total <= 2) {
+        alert("Un quiz doit avoir au moins 2 réponses.");
+        return;
+    }
+    if (row) row.remove();
+}
+
+function toggleAddQuizForm() {
+    const form = document.getElementById("quizForm");
+    form.classList.toggle("hidden");
+    if (!form.classList.contains("hidden")) {
+        document.getElementById("formQuizQuestion").value = "";
+        document.getElementById("reponsesForm").innerHTML = "";
+        compteurReponses = 0;
+        ajouterChampReponse();
+        ajouterChampReponse();
+    }
+}
+
+async function submitQuiz() {
+    const question = document.getElementById("formQuizQuestion").value.trim();
+    const err = document.getElementById("quizFormError");
+
+    if (!question) {
+        err.innerText = "La question est obligatoire";
+        err.classList.remove("hidden");
+        return;
+    }
+
+    const lignes = document.querySelectorAll("#reponsesForm > div");
+    if (lignes.length < 2) {
+        err.innerText = "Au moins 2 réponses sont nécessaires";
+        err.classList.remove("hidden");
+        return;
+    }
+
+    const reponses = [];
+    let toutesRemplies = true;
+    let auMoinsUneCorrecte = false;
+
+    lignes.forEach(row => {
+        const texte = row.querySelector(".reponse-texte").value.trim();
+        const correcte = row.querySelector(".reponse-correcte").checked;
+        if (!texte) toutesRemplies = false;
+        if (correcte) auMoinsUneCorrecte = true;
+        reponses.push({ texte, est_correcte: correcte });
+    });
+
+    if (!toutesRemplies) {
+        err.innerText = "Toutes les réponses doivent être remplies";
+        err.classList.remove("hidden");
+        return;
+    }
+    if (!auMoinsUneCorrecte) {
+        err.innerText = "Cochez au moins une bonne réponse";
+        err.classList.remove("hidden");
+        return;
+    }
+
+    try {
+        await createQuiz(leconActive.id, question, reponses);
+        toggleAddQuizForm();
+        err.classList.add("hidden");
+        await chargerQuiz(leconActive.id);
+    } catch(e) {
+        err.innerText = e.message;
+        err.classList.remove("hidden");
+    }
+}
+
+async function supprimerQuizExistant(quizId) {
+    if (!confirm("Supprimer ce quiz ?")) return;
+    try {
+        await deleteQuiz(quizId);
+        await chargerQuiz(leconActive.id);
+    } catch(e) {
+        alert("Erreur : " + e.message);
+    }
+}
+
+initRolePage().then(() => loadLecons());
 </script>
 </body>
 </html>

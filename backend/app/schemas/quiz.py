@@ -28,7 +28,7 @@ class QuizResponse(QuizBase):
         from_attributes = True
 
 class SoumettreReponse(BaseModel):
-    reponse_id: int
+    reponse_ids: List[int]
 
 class ResultatQuiz(BaseModel):
     correct: bool

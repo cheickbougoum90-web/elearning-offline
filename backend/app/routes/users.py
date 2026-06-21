@@ -76,3 +76,48 @@ def delete_user(
     db.delete(user)
     db.commit()
     return {"message": f"Utilisateur {user_id} supprimé"}
+
+@router.post("/{user_id}/impersonate")
+def impersonate_user(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(require_role("admin"))
+):
+    """Génère un token JWT pour se connecter en tant qu'un autre utilisateur.
+    Réservé à l'admin. Le token généré garde une trace de l'admin d'origine
+    via le champ 'impersonated_by' pour la traçabilité."""
+    from app.auth import create_access_token
+
+    target = db.query(Utilisateur).filter(Utilisateur.id == user_id).first()
+    if not target:
+        raise HTTPException(status_code=404, detail="Utilisateur introuvable")
+
+    if target.role == "admin":
+        raise HTTPException(
+            status_code=403,
+            detail="Impossible de se connecter en tant qu'un autre administrateur"
+        )
+
+    token = create_access_token(data={
+        "sub": str(target.id),
+        "role": target.role,
+        "impersonated_by": str(current_user.id)
+    })
+
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "user_id": target.id,
+        "role": target.role,
+        "nom": target.nom,
+        "impersonated_by_nom": current_user.nom
+    }
+
+@router.post("/stop-impersonation")
+def stop_impersonation(
+    db: Session = Depends(get_db),
+    current_user=Depends(require_role("admin", "professeur", "eleve"))
+):
+    """Permet de revenir au compte admin d'origine après une impersonation.
+    Nécessite que le frontend ait conservé le token admin original."""
+    return {"message": "Utilisez le token admin sauvegardé côté client pour revenir."}

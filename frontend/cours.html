@@ -33,6 +33,13 @@
         class="w-full border p-3 rounded mb-3 focus:outline-none focus:ring-2 focus:ring-blue-400">
     <textarea id="newDesc" placeholder="Description"
         class="w-full border p-3 rounded mb-3 focus:outline-none focus:ring-2 focus:ring-blue-400" rows="3"></textarea>
+    <div id="profSelectWrapper" class="hidden mb-3">
+        <label class="block text-sm text-gray-600 mb-1">Assigner à un professeur</label>
+        <select id="newProfId"
+            class="w-full border p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-400">
+            <option value="">Chargement des professeurs...</option>
+        </select>
+    </div>
     <div class="flex gap-3">
         <button onclick="submitCours()"
             class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700">
@@ -69,6 +76,27 @@ if (userRole === "professeur" || userRole === "admin") {
     document.getElementById("addBtn").classList.remove("hidden");
 }
 
+// Si admin : afficher le sélecteur de professeur et le remplir
+async function loadProfsForAdmin() {
+    if (userRole !== "admin") return;
+    document.getElementById("profSelectWrapper").classList.remove("hidden");
+    try {
+        const users = await getUsers();
+        const profs = users.filter(u => u.role === "professeur");
+        const select = document.getElementById("newProfId");
+        if (profs.length === 0) {
+            select.innerHTML = `<option value="">Aucun professeur disponible</option>`;
+            return;
+        }
+        select.innerHTML = profs.map(p =>
+            `<option value="${p.id}">${p.nom} (${p.email})</option>`
+        ).join("");
+    } catch(e) {
+        console.error("Erreur chargement professeurs:", e);
+    }
+}
+loadProfsForAdmin();
+
 async function loadCours() {
     const list = document.getElementById("coursList");
     try {
@@ -98,7 +126,7 @@ async function loadCours() {
                         class="text-yellow-600 text-sm hover:underline">
                         ⭐ Noter
                     </a>` : ''}
-                    ${(userRole === 'professeur' || userRole === 'admin') ? `
+                    ${(userRole === 'admin' || (userRole === 'professeur' && c.prof_id === parseInt(userId))) ? `
                     <div class="flex gap-2">
                         <button onclick="supprimerCours(${c.id})"
                             class="text-red-500 text-sm hover:underline">
@@ -129,8 +157,18 @@ async function submitCours() {
         return;
     }
 
+    let profId = null;
+    if (userRole === "admin") {
+        profId = document.getElementById("newProfId").value;
+        if (!profId) {
+            err.innerText = "Veuillez sélectionner un professeur";
+            err.classList.remove("hidden");
+            return;
+        }
+    }
+
     try {
-        await createCours(titre, desc);
+        await createCours(titre, desc, profId);
         hideAddForm();
         document.getElementById("newTitre").value = "";
         document.getElementById("newDesc").value  = "";

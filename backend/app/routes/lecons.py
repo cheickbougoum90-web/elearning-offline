@@ -1,14 +1,39 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
-
 from app.database import get_db
 from app.models.lecon import Lecon
+from app.models.cours import Cours
 from app.models.media import Media
 from app.schemas.lecon import LeconCreate, LeconUpdate, LeconResponse, MediaCreate, MediaResponse
 from app.auth import get_current_user, require_role
 
 router = APIRouter(prefix="/api/lecons", tags=["Leçons"])
+
+def _verifier_proprietaire_cours(cours_id: int, current_user, db: Session):
+    """Vérifie que l'utilisateur est admin ou propriétaire du cours.
+    Lève une exception 403/404 sinon."""
+    cours = db.query(Cours).filter(Cours.id == cours_id).first()
+    if not cours:
+        raise HTTPException(status_code=404, detail="Cours introuvable")
+    if current_user.role != "admin" and cours.prof_id != current_user.id:
+        raise HTTPException(
+            status_code=403,
+            detail="Vous ne pouvez gérer que les leçons de vos propres cours"
+        )
+    return cours
+
+def _verifier_proprietaire_lecon(lecon: Lecon, current_user, db: Session):
+    """Vérifie que l'utilisateur est admin ou propriétaire du cours
+    auquel appartient cette leçon."""
+    if current_user.role == "admin":
+        return
+    cours = db.query(Cours).filter(Cours.id == lecon.cours_id).first()
+    if not cours or cours.prof_id != current_user.id:
+        raise HTTPException(
+            status_code=403,
+            detail="Vous ne pouvez gérer que les leçons de vos propres cours"
+        )
 
 @router.get("/cours/{cours_id}", response_model=List[LeconResponse])
 def get_lecons_by_cours(
@@ -37,6 +62,8 @@ def create_lecon(
     db: Session = Depends(get_db),
     current_user=Depends(require_role("professeur", "admin"))
 ):
+    _verifier_proprietaire_cours(lecon_data.cours_id, current_user, db)
+
     lecon = Lecon(
         titre=lecon_data.titre,
         contenu=lecon_data.contenu,
@@ -59,10 +86,11 @@ def update_lecon(
     if not lecon:
         raise HTTPException(status_code=404, detail="Leçon introuvable")
 
+    _verifier_proprietaire_lecon(lecon, current_user, db)
+
     if lecon_data.titre:   lecon.titre   = lecon_data.titre
     if lecon_data.contenu: lecon.contenu = lecon_data.contenu
     if lecon_data.ordre:   lecon.ordre   = lecon_data.ordre
-
     db.commit()
     db.refresh(lecon)
     return lecon
@@ -76,6 +104,9 @@ def delete_lecon(
     lecon = db.query(Lecon).filter(Lecon.id == lecon_id).first()
     if not lecon:
         raise HTTPException(status_code=404, detail="Leçon introuvable")
+
+    _verifier_proprietaire_lecon(lecon, current_user, db)
+
     db.delete(lecon)
     db.commit()
     return {"message": f"Leçon {lecon_id} supprimée"}
@@ -89,6 +120,12 @@ def add_media(
     db: Session = Depends(get_db),
     current_user=Depends(require_role("professeur", "admin"))
 ):
+    lecon = db.query(Lecon).filter(Lecon.id == lecon_id).first()
+    if not lecon:
+        raise HTTPException(status_code=404, detail="Leçon introuvable")
+
+    _verifier_proprietaire_lecon(lecon, current_user, db)
+
     if media_data.type not in ["image", "video"]:
         raise HTTPException(status_code=400, detail="Type doit être 'image' ou 'video'")
 
@@ -112,6 +149,11 @@ def delete_media(
     media = db.query(Media).filter(Media.id == media_id).first()
     if not media:
         raise HTTPException(status_code=404, detail="Média introuvable")
+
+    lecon = db.query(Lecon).filter(Lecon.id == media.lecon_id).first()
+    if lecon:
+        _verifier_proprietaire_lecon(lecon, current_user, db)
+
     db.delete(media)
     db.commit()
     return {"message": f"Média {media_id} supprimé"}

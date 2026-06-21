@@ -57,23 +57,18 @@ async function loadQuiz() {
 function afficherQuestion(idx) {
     const container = document.getElementById("quizContainer");
     const q = quizData[idx];
-    const plusieursReponsesPossibles = q.reponses.filter(r => r.est_correcte).length > 1;
-
     container.innerHTML = `
         <div class="bg-white rounded-2xl shadow p-6">
-            <div class="flex justify-between text-sm text-gray-400 mb-2">
+            <div class="flex justify-between text-sm text-gray-400 mb-4">
                 <span>Question ${idx + 1} / ${quizData.length}</span>
                 <span>Score : ${score} / ${idx}</span>
             </div>
-            <h2 class="text-xl font-bold mb-2">${q.question}</h2>
-            <p class="text-xs text-gray-400 mb-4">
-                ${plusieursReponsesPossibles ? "Plusieurs réponses sont correctes" : "Une seule réponse est correcte"}
-            </p>
+            <h2 class="text-xl font-bold mb-6">${q.question}</h2>
             <div class="space-y-3" id="reponsesContainer">
                 ${q.reponses.map(r => `
                     <label class="block border rounded-xl p-4 cursor-pointer hover:bg-blue-50 transition"
                            id="label-${r.id}">
-                        <input type="checkbox" name="reponse" value="${r.id}" class="mr-2">
+                        <input type="radio" name="reponse" value="${r.id}" class="mr-2">
                         ${r.texte}
                     </label>
                 `).join("")}
@@ -88,37 +83,33 @@ function afficherQuestion(idx) {
 }
 
 async function validerReponse(quizId) {
-    const selected = document.querySelectorAll('input[name="reponse"]:checked');
+    const selected = document.querySelector('input[name="reponse"]:checked');
     const resultat = document.getElementById("resultatQ");
 
-    if (selected.length === 0) {
-        resultat.innerHTML = `<p class="text-orange-500">Sélectionne au moins une réponse.</p>`;
+    if (!selected) {
+        resultat.innerHTML = `<p class="text-orange-500">Sélectionne une réponse.</p>`;
         resultat.classList.remove("hidden");
         return;
     }
 
+    // Désactiver les boutons
     document.querySelectorAll('input[name="reponse"]').forEach(i => i.disabled = true);
     document.querySelector("button[onclick]").disabled = true;
 
-    const reponseIds = Array.from(selected).map(s => parseInt(s.value));
-
     try {
-        const res = await soumettreReponse(quizId, reponseIds);
-
-        selected.forEach(s => {
-            s.parentElement.className = res.correct
-                ? "block border-2 border-green-500 bg-green-50 rounded-xl p-4"
-                : "block border-2 border-red-400 bg-red-50 rounded-xl p-4";
-        });
+        const res = await soumettreReponse(quizId, parseInt(selected.value));
 
         if (res.correct) {
             score++;
+            selected.parentElement.className = "block border-2 border-green-500 bg-green-50 rounded-xl p-4";
             resultat.innerHTML = `<div class="bg-green-100 text-green-700 p-4 rounded-xl">✅ ${res.message}</div>`;
         } else {
+            selected.parentElement.className = "block border-2 border-red-400 bg-red-50 rounded-xl p-4";
             resultat.innerHTML = `<div class="bg-red-100 text-red-700 p-4 rounded-xl">❌ ${res.message}</div>`;
         }
         resultat.classList.remove("hidden");
 
+        // Bouton suivant après 1.5s
         setTimeout(() => {
             currentIdx++;
             if (currentIdx < quizData.length) {
@@ -139,6 +130,7 @@ async function afficherResultatFinal() {
     const pct = Math.round((score / quizData.length) * 100);
     const emoji = pct >= 80 ? "🎉" : pct >= 50 ? "👍" : "💪";
 
+    // Enregistrer la progression avec le VRAI score du quiz
     try {
         await saveProgression(parseInt(leconId), "termine", pct);
     } catch(e) {
