@@ -7,7 +7,7 @@ class CoursBase(BaseModel):
     description: Optional[str] = None
 
 class CoursCreate(CoursBase):
-    pass
+    prof_id: Optional[int] = None  # rempli uniquement si l'admin crée le cours
 
 class CoursUpdate(BaseModel):
     titre: Optional[str] = None

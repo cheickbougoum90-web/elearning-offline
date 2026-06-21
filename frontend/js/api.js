@@ -72,11 +72,13 @@ async function getCours() {
     return handleResponse(res);
 }
 
-async function createCours(titre, description) {
+async function createCours(titre, description, profId) {
+    const body = { titre, description };
+    if (profId) body.prof_id = parseInt(profId);
     const res = await fetch(`${API_URL}/api/cours/`, {
         method: "POST",
         headers: authHeaders(),
-        body: JSON.stringify({ titre, description })
+        body: JSON.stringify(body)
     });
 
     return handleResponse(res);
@@ -111,11 +113,11 @@ async function getQuiz(leconId) {
     return handleResponse(res);
 }
 
-async function soumettreReponse(quizId, reponseId) {
+async function soumettreReponse(quizId, reponseIds) {
     const res = await fetch(`${API_URL}/api/quiz/${quizId}/soumettre`, {
         method: "POST",
         headers: authHeaders(),
-        body: JSON.stringify({ reponse_id: reponseId })
+        body: JSON.stringify({ reponse_ids: reponseIds })
     });
 
     return handleResponse(res);
@@ -202,3 +204,105 @@ async function getStats(userId, coursId) {
     return handleResponse(res);
 }
 
+
+// ============================================================
+// IMPERSONATION (admin uniquement)
+// ============================================================
+async function impersonateUser(userId) {
+    const res = await fetch(`${API_URL}/api/users/${userId}/impersonate`, {
+        method: "POST",
+        headers: authHeaders()
+    });
+    return handleResponse(res);
+}
+
+function startImpersonation(data) {
+    // Sauvegarder le token admin actuel pour pouvoir y revenir
+    localStorage.setItem("admin_token", getToken());
+    localStorage.setItem("admin_nom", localStorage.getItem("nom"));
+
+    // Remplacer la session par celle de l'utilisateur ciblé
+    localStorage.setItem("token", data.access_token);
+    localStorage.setItem("user_id", data.user_id);
+    localStorage.setItem("role", data.role);
+    localStorage.setItem("nom", data.nom);
+    localStorage.setItem("impersonating", "true");
+
+    if (data.role === "professeur") window.location.href = "prof.html";
+    if (data.role === "eleve")      window.location.href = "eleve.html";
+}
+
+function stopImpersonation() {
+    const adminToken = localStorage.getItem("admin_token");
+    const adminNom   = localStorage.getItem("admin_nom");
+    if (!adminToken) {
+        logout();
+        return;
+    }
+    localStorage.setItem("token", adminToken);
+    localStorage.setItem("nom", adminNom);
+    localStorage.setItem("role", "admin");
+    localStorage.removeItem("admin_token");
+    localStorage.removeItem("admin_nom");
+    localStorage.removeItem("impersonating");
+    window.location.href = "admin.html";
+}
+
+// ============================================================
+// STATS PROFESSEUR
+// ============================================================
+async function getProfStats(profId) {
+    const res = await fetch(`${API_URL}/api/cours/prof/${profId}/stats`, {
+        headers: authHeaders()
+    });
+    return handleResponse(res);
+}
+
+// ============================================================
+// GESTION LEÇONS (professeur)
+// ============================================================
+async function createLecon(coursId, titre, contenu, ordre) {
+    const res = await fetch(`${API_URL}/api/lecons/`, {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify({ cours_id: coursId, titre, contenu, ordre })
+    });
+    return handleResponse(res);
+}
+
+async function updateLecon(leconId, titre, contenu, ordre) {
+    const res = await fetch(`${API_URL}/api/lecons/${leconId}`, {
+        method: "PUT",
+        headers: authHeaders(),
+        body: JSON.stringify({ titre, contenu, ordre })
+    });
+    return handleResponse(res);
+}
+
+async function deleteLecon(leconId) {
+    const res = await fetch(`${API_URL}/api/lecons/${leconId}`, {
+        method: "DELETE",
+        headers: authHeaders()
+    });
+    return handleResponse(res);
+}
+
+// ============================================================
+// GESTION QUIZ (professeur)
+// ============================================================
+async function createQuiz(leconId, question, reponses) {
+    const res = await fetch(`${API_URL}/api/quiz/`, {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify({ lecon_id: leconId, question, reponses })
+    });
+    return handleResponse(res);
+}
+
+async function deleteQuiz(quizId) {
+    const res = await fetch(`${API_URL}/api/quiz/${quizId}`, {
+        method: "DELETE",
+        headers: authHeaders()
+    });
+    return handleResponse(res);
+}

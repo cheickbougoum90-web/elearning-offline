@@ -44,10 +44,24 @@ def create_cours(
     db: Session = Depends(get_db),
     current_user=Depends(require_role("professeur", "admin"))
 ):
+    # Un admin peut assigner le cours à un professeur précis.
+    # Un professeur crée toujours pour lui-même (prof_id ignoré si fourni).
+    if current_user.role == "admin" and cours_data.prof_id:
+        from app.models.utilisateur import Utilisateur
+        prof = db.query(Utilisateur).filter(
+            Utilisateur.id == cours_data.prof_id,
+            Utilisateur.role == "professeur"
+        ).first()
+        if not prof:
+            raise HTTPException(status_code=400, detail="Professeur invalide")
+        assigned_prof_id = prof.id
+    else:
+        assigned_prof_id = current_user.id
+
     cours = Cours(
         titre=cours_data.titre,
         description=cours_data.description,
-        prof_id=current_user.id
+        prof_id=assigned_prof_id
     )
     db.add(cours)
     db.commit()
@@ -94,3 +108,48 @@ def delete_cours(
     db.commit()
     cache_delete_pattern("cours:*")
     return {"message": f"Cours {cours_id} supprimé"}
+
+@router.get("/prof/{prof_id}/stats")
+def get_prof_stats(
+    prof_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Statistiques du tableau de bord professeur :
+    nombre de cours, nombre de quiz créés, nombre d'élèves touchés,
+    note moyenne sur tous ses cours."""
+    from app.models.lecon import Lecon
+    from app.models.quiz import Quiz
+    from app.models.progression import Progression
+    from app.models.avis import Avis
+    from sqlalchemy import func
+
+    mes_cours = db.query(Cours).filter(Cours.prof_id == prof_id).all()
+    mes_cours_ids = [c.id for c in mes_cours]
+
+    nombre_cours = len(mes_cours)
+
+    nombre_quiz = 0
+    nombre_etudiants = 0
+    note_moyenne = 0.0
+
+    if mes_cours_ids:
+        nombre_quiz = db.query(Quiz).join(Lecon).filter(
+            Lecon.cours_id.in_(mes_cours_ids)
+        ).count()
+
+        nombre_etudiants = db.query(Progression.user_id).join(Lecon).filter(
+            Lecon.cours_id.in_(mes_cours_ids)
+        ).distinct().count()
+
+        moyenne = db.query(func.avg(Avis.note)).filter(
+            Avis.cours_id.in_(mes_cours_ids)
+        ).scalar()
+        note_moyenne = round(float(moyenne), 1) if moyenne else 0.0
+
+    return {
+        "nombre_cours": nombre_cours,
+        "nombre_quiz": nombre_quiz,
+        "nombre_etudiants": nombre_etudiants,
+        "note_moyenne": note_moyenne
+    }

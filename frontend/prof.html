@@ -1,261 +1,159 @@
-requireAuth();
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Professeur</title>
-
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <style>
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(15px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .fade-in {
-            animation: fadeIn 0.6s ease-out;
-        }
-    </style>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Professeur</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+@keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn 0.6s ease-out; }
+</style>
 </head>
-
 <body class="bg-gradient-to-br from-blue-50 via-white to-blue-100 min-h-screen">
 
-    <!-- HEADER -->
-    <header class="bg-white shadow-sm sticky top-0 z-10">
+<!-- BANDEAU IMPERSONATION -->
+<div id="impersonationBanner" class="hidden bg-yellow-400 text-yellow-900 text-center py-2 text-sm font-semibold sticky top-0 z-50">
+    🎭 Vous naviguez en tant que <span id="impersonatedNom"></span> —
+    <button onclick="stopImpersonation()" class="underline hover:text-yellow-700 ml-2">Retour Admin</button>
+</div>
 
-        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-
-            <div>
-                <h1 class="text-2xl font-bold text-blue-600">
-                    👨‍🏫 E-learning
-                </h1>
-            </div>
-
-            <nav class="flex gap-6 text-gray-600 font-medium">
-
-                <a href="prof.html" class="text-blue-600">
-                    Dashboard
-                </a>
-
-                <a href="cours.html" class="hover:text-blue-600 transition">
-                    Cours
-                </a>
-
-                <a href="quiz.html" class="hover:text-blue-600 transition">
-                    Quiz
-                </a>
-
-                <a href="index.html" class="hover:text-red-500 transition">
-                    Déconnexion
-                </a>
-
-            </nav>
-
+<!-- HEADER -->
+<header class="bg-white shadow-sm sticky top-0 z-10">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+        <div>
+            <h1 class="text-2xl font-bold text-blue-600">👨‍🏫 E-learning</h1>
         </div>
+        <nav class="flex gap-6 text-gray-600 font-medium items-center">
+            <a href="prof.html" class="text-blue-600">Dashboard</a>
+            <a href="cours.html" class="hover:text-blue-600 transition">Cours</a>
+            <a href="classement.html" class="hover:text-blue-600 transition">Classement</a>
+            <button onclick="logout()" class="text-red-500 text-sm hover:underline">Déconnexion</button>
+        </nav>
+    </div>
+</header>
 
-    </header>
+<!-- CONTENU -->
+<main class="max-w-7xl mx-auto p-6 fade-in">
 
-    <!-- CONTENU -->
-    <main class="max-w-7xl mx-auto p-6 fade-in">
+    <!-- BIENVENUE -->
+    <section class="mb-8">
+        <h2 class="text-3xl font-bold text-gray-800 mb-2">Bienvenue Professeur 👋</h2>
+        <p class="text-gray-500">Gérez vos cours et suivez les performances de vos étudiants.</p>
+    </section>
 
-        <!-- BIENVENUE -->
-        <section class="mb-8">
+    <!-- STATISTIQUES -->
+    <section class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+        <div class="bg-white rounded-2xl p-6 shadow">
+            <div class="text-4xl mb-3">📚</div>
+            <h3 class="text-gray-500 text-sm">Cours publiés</h3>
+            <p id="statCoursPubl" class="text-3xl font-bold text-blue-600 mt-2">—</p>
+        </div>
+        <div class="bg-white rounded-2xl p-6 shadow">
+            <div class="text-4xl mb-3">📝</div>
+            <h3 class="text-gray-500 text-sm">Quiz créés</h3>
+            <p id="statQuizCreated" class="text-3xl font-bold text-green-600 mt-2">—</p>
+        </div>
+        <div class="bg-white rounded-2xl p-6 shadow">
+            <div class="text-4xl mb-3">👨‍🎓</div>
+            <h3 class="text-gray-500 text-sm">Étudiants touchés</h3>
+            <p id="statEtudiants" class="text-3xl font-bold text-purple-600 mt-2">—</p>
+        </div>
+        <div class="bg-white rounded-2xl p-6 shadow">
+            <div class="text-4xl mb-3">⭐</div>
+            <h3 class="text-gray-500 text-sm">Note moyenne</h3>
+            <p id="statNoteMoyenne" class="text-3xl font-bold text-orange-500 mt-2">—</p>
+        </div>
+    </section>
 
-            <h2 class="text-3xl font-bold text-gray-800 mb-2">
-                Bienvenue Professeur 👋
-            </h2>
+    <!-- ACTIONS RAPIDES -->
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+        <a href="cours.html"
+            class="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition transform hover:-translate-y-1">
+            <div class="text-5xl mb-4">📚</div>
+            <h3 class="text-xl font-bold text-gray-800">Gérer mes cours</h3>
+            <p class="text-gray-500 mt-2">Créer, modifier ou supprimer mes cours et leçons.</p>
+            <div class="mt-4 text-blue-600 font-semibold">Accéder →</div>
+        </a>
+        <a href="classement.html"
+            class="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition transform hover:-translate-y-1">
+            <div class="text-5xl mb-4">🏆</div>
+            <h3 class="text-xl font-bold text-gray-800">Mon classement</h3>
+            <p class="text-gray-500 mt-2">Voir ma position parmi les professeurs.</p>
+            <div class="mt-4 text-blue-600 font-semibold">Voir →</div>
+        </a>
+    </section>
 
-            <p class="text-gray-500">
-                Gérez vos cours, quiz et suivez les performances des étudiants.
-            </p>
+    <!-- MES COURS -->
+    <section class="bg-white rounded-2xl shadow p-6">
+        <h3 class="text-xl font-bold text-gray-800 mb-6">📋 Mes cours</h3>
+        <div id="mesCoursList" class="space-y-3">
+            <p class="text-gray-400 text-center py-6">Chargement...</p>
+        </div>
+    </section>
 
-        </section>
+</main>
 
-        <!-- STATISTIQUES -->
-        <section class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
-
-            <div class="bg-white rounded-2xl p-6 shadow">
-
-                <div class="text-4xl mb-3">📚</div>
-
-                <h3 class="text-gray-500 text-sm">
-                    Cours publiés
-                </h3>
-
-                <p class="text-3xl font-bold text-blue-600 mt-2">
-                    12
-                </p>
-
-            </div>
-
-            <div class="bg-white rounded-2xl p-6 shadow">
-
-                <div class="text-4xl mb-3">📝</div>
-
-                <h3 class="text-gray-500 text-sm">
-                    Quiz créés
-                </h3>
-
-                <p class="text-3xl font-bold text-green-600 mt-2">
-                    18
-                </p>
-
-            </div>
-
-            <div class="bg-white rounded-2xl p-6 shadow">
-
-                <div class="text-4xl mb-3">👨‍🎓</div>
-
-                <h3 class="text-gray-500 text-sm">
-                    Étudiants inscrits
-                </h3>
-
-                <p class="text-3xl font-bold text-purple-600 mt-2">
-                    145
-                </p>
-
-            </div>
-
-            <div class="bg-white rounded-2xl p-6 shadow">
-
-                <div class="text-4xl mb-3">⭐</div>
-
-                <h3 class="text-gray-500 text-sm">
-                    Note moyenne
-                </h3>
-
-                <p class="text-3xl font-bold text-orange-500 mt-2">
-                    4.8
-                </p>
-
-            </div>
-
-        </section>
-
-        <!-- ACTIONS RAPIDES -->
-        <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-
-            <a href="cours.html"
-                class="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition transform hover:-translate-y-1">
-
-                <div class="text-5xl mb-4">📚</div>
-
-                <h3 class="text-xl font-bold text-gray-800">
-                    Gérer les cours
-                </h3>
-
-                <p class="text-gray-500 mt-2">
-                    Ajouter, modifier ou supprimer des cours.
-                </p>
-
-                <div class="mt-4 text-blue-600 font-semibold">
-                    Accéder →
-                </div>
-
-            </a>
-
-            <a href="quiz.html"
-                class="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition transform hover:-translate-y-1">
-
-                <div class="text-5xl mb-4">📝</div>
-
-                <h3 class="text-xl font-bold text-gray-800">
-                    Gérer les quiz
-                </h3>
-
-                <p class="text-gray-500 mt-2">
-                    Créer et publier des quiz.
-                </p>
-
-                <div class="mt-4 text-blue-600 font-semibold">
-                    Accéder →
-                </div>
-
-            </a>
-
-            <a href="#"
-                class="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition transform hover:-translate-y-1">
-
-                <div class="text-5xl mb-4">📊</div>
-
-                <h3 class="text-xl font-bold text-gray-800">
-                    Statistiques
-                </h3>
-
-                <p class="text-gray-500 mt-2">
-                    Analyser les performances des étudiants.
-                </p>
-
-                <div class="mt-4 text-blue-600 font-semibold">
-                    Voir →
-                </div>
-
-            </a>
-
-        </section>
-
-        <!-- ACTIVITÉS RÉCENTES -->
-        <section class="bg-white rounded-2xl shadow p-6">
-
-            <h3 class="text-xl font-bold text-gray-800 mb-6">
-                Activités récentes
-            </h3>
-
-            <div class="space-y-4">
-
-                <div class="border-b pb-3">
-                    <p class="font-medium">
-                        Nouveau cours publié : Réseaux IP
-                    </p>
-                    <p class="text-sm text-gray-500">
-                        Il y a 2 heures
-                    </p>
-                </div>
-
-                <div class="border-b pb-3">
-                    <p class="font-medium">
-                        Quiz "TCP/IP" créé avec succès
-                    </p>
-                    <p class="text-sm text-gray-500">
-                        Aujourd'hui
-                    </p>
-                </div>
-
-                <div>
-                    <p class="font-medium">
-                        15 nouveaux étudiants inscrits
-                    </p>
-                    <p class="text-sm text-gray-500">
-                        Cette semaine
-                    </p>
-                </div>
-
-            </div>
-
-        </section>
-
-    </main>
-
-</body>
-
-</html><script src="js/api.js"></script>
+<script src="js/api.js"></script>
 <script>
 requireAuth();
+
 const nom = localStorage.getItem("nom");
+const userId = localStorage.getItem("user_id");
+
 if (nom) {
     document.querySelector("h2").innerText = "Bienvenue " + nom + " 👋";
 }
+
 const role = localStorage.getItem("role");
 if (role === "eleve") window.location.href = "eleve.html";
+if (role === "admin") window.location.href = "admin.html";
+
+if (localStorage.getItem("impersonating") === "true") {
+    document.getElementById("impersonationBanner").classList.remove("hidden");
+    document.getElementById("impersonatedNom").innerText = nom;
+}
+
+async function loadProfDashboard() {
+    try {
+        const stats = await getProfStats(userId);
+        document.getElementById("statCoursPubl").innerText   = stats.nombre_cours;
+        document.getElementById("statQuizCreated").innerText = stats.nombre_quiz;
+        document.getElementById("statEtudiants").innerText   = stats.nombre_etudiants;
+        document.getElementById("statNoteMoyenne").innerText = stats.note_moyenne.toFixed(1);
+
+        const tousLesCours = await getCours();
+        const mesCours = tousLesCours.filter(c => c.prof_id === parseInt(userId));
+        const list = document.getElementById("mesCoursList");
+
+        if (mesCours.length === 0) {
+            list.innerHTML = `<p class="text-gray-400 text-center py-6">
+                Vous n'avez pas encore créé de cours. <a href="cours.html" class="text-blue-600 hover:underline">Créer un cours →</a>
+            </p>`;
+            return;
+        }
+
+        list.innerHTML = mesCours.map(c => `
+            <div class="flex justify-between items-center border-b pb-3">
+                <div>
+                    <p class="font-medium text-gray-800">${c.titre}</p>
+                    <p class="text-sm text-gray-500">${c.description || "Pas de description"}</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="text-yellow-500 text-sm">★ ${c.moyenne_notes.toFixed(1)}</span>
+                    <a href="lecon.html?cours_id=${c.id}&cours_titre=${encodeURIComponent(c.titre)}"
+                        class="text-blue-600 text-sm hover:underline">Gérer →</a>
+                </div>
+            </div>
+        `).join("");
+
+    } catch(e) {
+        console.error("Erreur chargement dashboard prof:", e);
+    }
+}
+
+loadProfDashboard();
 </script>
+
+</body>
+</html>

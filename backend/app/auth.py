@@ -79,3 +79,12 @@ def require_role(*roles):
             )
         return current_user
     return checker
+
+def get_impersonation_info(token: str = Depends(oauth2_scheme)) -> Optional[dict]:
+    """Si le token courant est une session d'impersonation, retourne
+    les infos de l'admin d'origine. Sinon retourne None."""
+    payload = decode_token(token)
+    admin_id = payload.get("impersonated_by")
+    if not admin_id:
+        return None
+    return {"admin_id": int(admin_id)}
