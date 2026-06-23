@@ -11,10 +11,7 @@
     from { opacity: 0; transform: translateY(15px); }
     to { opacity: 1; transform: translateY(0); }
 }
-
-.fade-in {  
-    animation: fadeIn 0.6s ease-out;
-}
+.fade-in { animation: fadeIn 0.6s ease-out; }
 </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 via-white to-blue-100 min-h-screen">
@@ -38,11 +35,14 @@
 </header>
 
 <main class="max-w-6xl mx-auto p-6 fade-in">
+
+    <!-- BIENVENUE -->
     <div class="mb-8">
         <h2 class="text-2xl font-bold text-gray-800">Bienvenue 👋</h2>
         <p class="text-gray-500">Voici ton espace d'apprentissage</p>
     </div>
 
+    <!-- ACTIONS RAPIDES -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <a href="cours.html" class="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition transform hover:-translate-y-1">
             <div class="text-4xl mb-3">📚</div>
@@ -50,14 +50,12 @@
             <p class="text-gray-500 text-sm mt-1">Accède à tes cours et leçons</p>
             <div class="mt-4 text-blue-600 font-semibold">Accéder →</div>
         </a>
-
         <a href="cours.html" class="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition transform hover:-translate-y-1">
             <div class="text-4xl mb-3">🧠</div>
             <h3 class="text-lg font-bold text-gray-800">Quiz</h3>
             <p class="text-gray-500 text-sm mt-1">Ouvre un cours pour accéder à ses quiz</p>
             <div class="mt-4 text-blue-600 font-semibold">Commencer →</div>
         </a>
-
         <a href="classement.html" class="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition transform hover:-translate-y-1">
             <div class="text-4xl mb-3">🏆</div>
             <h3 class="text-lg font-bold text-gray-800">Classement</h3>
@@ -66,6 +64,7 @@
         </a>
     </div>
 
+    <!-- STATS -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
         <div class="bg-white p-5 rounded-xl shadow text-center">
             <p class="text-gray-500 text-sm">Cours suivis</p>
@@ -80,13 +79,24 @@
             <h3 id="statScoreMoyen" class="text-2xl font-bold text-purple-600">—</h3>
         </div>
     </div>
+
+    <!-- MES COURS EN COURS -->
+    <div class="mt-10 bg-white rounded-2xl shadow p-6">
+        <h3 class="text-xl font-bold text-gray-800 mb-6">📖 Mes cours en cours</h3>
+        <div id="coursEnCours">
+            <p class="text-gray-400 text-center py-6">Chargement...</p>
+        </div>
+    </div>
+
 </main>
 
 <script src="js/api.js"></script>
 <script>
 requireAuth();
 
-const nom = localStorage.getItem("nom");
+const nom    = localStorage.getItem("nom");
+const userId = localStorage.getItem("user_id");
+
 if (nom) {
     document.querySelector("h2").innerText = "Bienvenue " + nom + " 👋";
 }
@@ -95,15 +105,19 @@ const role = localStorage.getItem("role");
 if (role === "professeur") window.location.href = "prof.html";
 if (role === "admin")      window.location.href = "admin.html";
 
-// Charger les vraies statistiques de l'élève
+if (localStorage.getItem("impersonating") === "true") {
+    document.getElementById("impersonationBanner").classList.remove("hidden");
+    document.getElementById("impersonatedNom").innerText = nom;
+}
+
 async function loadDashboardStats() {
-    const userId = localStorage.getItem("user_id");
     try {
         const cours = await getCours();
 
         let coursSuivis = 0;
         let totalTerminees = 0;
         let totalScores = [];
+        let coursEntames = [];
 
         for (const c of cours) {
             try {
@@ -111,6 +125,7 @@ async function loadDashboardStats() {
 
                 if (stats.lecons_terminees > 0) {
                     coursSuivis++;
+                    coursEntames.push({ cours: c, stats });
                 }
 
                 totalTerminees += stats.lecons_terminees;
@@ -118,13 +133,54 @@ async function loadDashboardStats() {
             } catch(e) {}
         }
 
-        document.getElementById("statCoursSuivis").innerText = coursSuivis;
-        document.getElementById("statLeconsTerminees").innerText = totalTerminees;
+        document.getElementById("statCoursSuivis").innerText     = coursSuivis;
+        document.getElementById("statLeconsTerminees").innerText  = totalTerminees;
 
         const moyenne = totalScores.length
             ? Math.round(totalScores.reduce((a,b) => a+b, 0) / totalScores.length)
             : 0;
         document.getElementById("statScoreMoyen").innerText = moyenne + "%";
+
+        // Remplir la section "Mes cours en cours"
+        const zone = document.getElementById("coursEnCours");
+        if (coursEntames.length === 0) {
+            zone.innerHTML = `
+                <div class="text-center py-6">
+                    <p class="text-gray-400 mb-3">Tu n'as pas encore commencé de cours.</p>
+                    <a href="cours.html" class="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 text-sm">
+                        Découvrir les cours →
+                    </a>
+                </div>`;
+            return;
+        }
+
+        zone.innerHTML = coursEntames.map(({ cours: c, stats: s }) => {
+            const pct = Math.round(s.pourcentage || 0);
+            const estTermine = pct === 100;
+            return `
+                <div class="flex items-center gap-4 border-b pb-4 mb-4 last:border-0 last:pb-0 last:mb-0">
+                    <div class="flex-1">
+                        <div class="flex justify-between items-center mb-1">
+                            <p class="font-semibold text-gray-800">${c.titre}</p>
+                            <span class="text-xs ${estTermine ? 'text-green-600 font-bold' : 'text-gray-500'}">
+                                ${estTermine ? '✅ Terminé' : pct + '%'}
+                            </span>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-2">👨‍🏫 ${c.prof_nom || 'Professeur'} — ${s.lecons_terminees}/${s.total_lecons} leçon(s)</p>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="h-2 rounded-full transition-all ${estTermine ? 'bg-green-500' : 'bg-blue-600'}"
+                                style="width:${pct}%"></div>
+                        </div>
+                    </div>
+                    <a href="lecon.html?cours_id=${c.id}&cours_titre=${encodeURIComponent(c.titre)}"
+                        class="shrink-0 ${estTermine
+                            ? 'text-green-600 hover:underline text-sm'
+                            : 'bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm'}">
+                        ${estTermine ? 'Revoir →' : 'Continuer →'}
+                    </a>
+                </div>
+            `;
+        }).join("");
 
     } catch(e) {
         console.error("Erreur chargement stats:", e);
@@ -132,11 +188,6 @@ async function loadDashboardStats() {
 }
 
 loadDashboardStats();
-
-if (localStorage.getItem("impersonating") === "true") {
-    document.getElementById("impersonationBanner").classList.remove("hidden");
-    document.getElementById("impersonatedNom").innerText = nom;
-}
 </script>
 </body>
 </html>
