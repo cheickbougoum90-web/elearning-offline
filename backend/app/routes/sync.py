@@ -19,9 +19,17 @@ def get_cloud_token() -> str:
 
 @router.post("/receive/progressions")
 def receive_progressions(payload: dict, db: Session = Depends(get_db)):
+    from app.models.lecon import Lecon
+    from app.models.utilisateur import Utilisateur
     inserted = 0
     updated  = 0
+    skipped  = 0
+    lecons_ids = {l.id for l in db.query(Lecon.id).all()}
+    users_ids  = {u.id for u in db.query(Utilisateur.id).all()}
     for p in payload.get("progressions", []):
+        if p["lecon_id"] not in lecons_ids or p["user_id"] not in users_ids:
+            skipped += 1
+            continue
         existing = db.query(Progression).filter(
             Progression.user_id  == p["user_id"],
             Progression.lecon_id == p["lecon_id"]
@@ -42,7 +50,7 @@ def receive_progressions(payload: dict, db: Session = Depends(get_db)):
             ))
             inserted += 1
     db.commit()
-    return {"inserted": inserted, "updated": updated}
+    return {"inserted": inserted, "updated": updated, "skipped": skipped}
 
 @router.post("/receive/avis")
 def receive_avis(payload: dict, db: Session = Depends(get_db)):
