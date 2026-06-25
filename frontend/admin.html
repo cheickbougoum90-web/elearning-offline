@@ -73,7 +73,7 @@
     </div>
 
     <!-- ================= SYNCHRONISATION ================= -->
-    <div class="bg-white rounded-xl shadow p-6 mb-8">
+    <div id="syncSection" class="bg-white rounded-xl shadow p-6 mb-8">
         <h3 class="text-xl font-bold mb-4">☁️ Synchronisation Cloud</h3>
         <button onclick="lancerSync()"
             class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700">
@@ -273,6 +273,28 @@ window.addEventListener("offline", updateNetwork);
 
 updateNetwork();
 loadDashboard();
+
+// Cacher le bouton sync si on est sur le serveur cloud (EC2)
+async function checkSyncVisibility() {
+    try {
+        const status = await getSyncStatus();
+        if (!status.cloud_url) {
+            // On est sur EC2 — pas de serveur cloud cible configuré
+            const section = document.getElementById("syncSection");
+            if (section) {
+                section.innerHTML = `
+                    <h3 class="text-xl font-bold mb-4">☁️ Serveur Cloud Central</h3>
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-blue-700 text-sm">
+                        <p class="font-semibold mb-1">✅ Ce serveur est le cloud central</p>
+                        <p>Les serveurs locaux des écoles se synchronisent vers ce serveur.</p>
+                        <p class="mt-2">Progressions reçues : <strong>${status.total_progressions}</strong></p>
+                    </div>
+                `;
+            }
+        }
+    } catch(e) {}
+}
+checkSyncVisibility();
 </script>
 
 </body>
