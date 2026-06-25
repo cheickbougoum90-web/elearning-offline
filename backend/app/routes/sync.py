@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 from datetime import datetime
 import httpx
@@ -18,7 +18,7 @@ def get_cloud_token() -> str:
     return create_access_token(data={"sub": "1", "role": "admin"})
 
 @router.post("/receive/progressions")
-def receive_progressions(payload: dict, db: Session = Depends(get_db)):
+def receive_progressions(payload: dict, request: Request, db: Session = Depends(get_db)):
     from app.models.lecon import Lecon
     from app.models.utilisateur import Utilisateur
     inserted = 0
@@ -50,6 +50,20 @@ def receive_progressions(payload: dict, db: Session = Depends(get_db)):
             ))
             inserted += 1
     db.commit()
+
+    # Logger l'IP source
+    try:
+        from app.models.sync_log import SyncLog
+        source_ip = request.client.host
+        db.add(SyncLog(
+            source_ip=source_ip,
+            nb_progressions=inserted + updated,
+            nb_avis=0
+        ))
+        db.commit()
+    except Exception:
+        pass
+
     return {"inserted": inserted, "updated": updated, "skipped": skipped}
 
 @router.post("/receive/avis")
@@ -304,6 +318,25 @@ async def cloud_stats(
     # Dernière synchronisation reçue
     derniere_sync = db.query(func.max(Progression.updated_at)).scalar()
 
+    # Écoles connectées (IPs sources distinctes avec stats)
+    from app.models.sync_log import SyncLog
+    from sqlalchemy import func as sqlfunc
+
+    ecoles = db.query(
+        SyncLog.source_ip,
+        sqlfunc.sum(SyncLog.nb_progressions).label("total_prog"),
+        sqlfunc.max(SyncLog.created_at).label("derniere_sync_ecole")
+    ).group_by(SyncLog.source_ip).all()
+
+    ecoles_data = [
+        {
+            "ip": e.source_ip,
+            "progressions": int(e.total_prog or 0),
+            "derniere_sync": str(e.derniere_sync_ecole) if e.derniere_sync_ecole else None
+        }
+        for e in ecoles
+    ]
+
     return {
         "total_progressions": total_progressions,
         "total_avis":         total_avis,
@@ -311,5 +344,7 @@ async def cloud_stats(
         "total_eleves":       total_eleves,
         "total_profs":        total_profs,
         "derniere_sync":      str(derniere_sync) if derniere_sync else None,
-        "est_serveur_cloud":  not bool(CLOUD_URL)
+        "est_serveur_cloud":  not bool(CLOUD_URL),
+        "ecoles_connectees":  ecoles_data,
+        "nb_ecoles":          len(ecoles_data)
     }

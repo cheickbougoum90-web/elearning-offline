@@ -6,3 +6,4 @@ from app.models.quiz import Quiz
 from app.models.reponse import Reponse
 from app.models.progression import Progression
 from app.models.avis import Avis
+from app.models.sync_log import SyncLog
