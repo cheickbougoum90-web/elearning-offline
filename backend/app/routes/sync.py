@@ -278,3 +278,38 @@ async def sync_status(
         "cloud_accessible":   cloud_accessible,
         "statut": "✅ À jour" if en_attente == 0 else f"⚠️ {en_attente} éléments en attente"
     }
+
+@router.get("/cloud-stats")
+async def cloud_stats(
+    db: Session = Depends(get_db),
+    current_user=Depends(require_role("admin"))
+):
+    """Tableau de bord du serveur cloud central.
+    Affiche les statistiques globales de synchronisation."""
+    from app.models.avis import Avis
+    from app.models.utilisateur import Utilisateur
+    from app.models.cours import Cours
+    from sqlalchemy import func
+
+    total_progressions = db.query(Progression).count()
+    total_avis         = db.query(Avis).count()
+    total_cours        = db.query(Cours).filter(Cours.archive == False).count()
+    total_eleves       = db.query(Utilisateur).filter(
+        Utilisateur.role == "eleve"
+    ).count()
+    total_profs        = db.query(Utilisateur).filter(
+        Utilisateur.role == "professeur"
+    ).count()
+
+    # Dernière synchronisation reçue
+    derniere_sync = db.query(func.max(Progression.updated_at)).scalar()
+
+    return {
+        "total_progressions": total_progressions,
+        "total_avis":         total_avis,
+        "total_cours_actifs": total_cours,
+        "total_eleves":       total_eleves,
+        "total_profs":        total_profs,
+        "derniere_sync":      str(derniere_sync) if derniere_sync else None,
+        "est_serveur_cloud":  not bool(CLOUD_URL)
+    }

@@ -274,25 +274,68 @@ window.addEventListener("offline", updateNetwork);
 updateNetwork();
 loadDashboard();
 
-// Cacher le bouton sync si on est sur le serveur cloud (EC2)
+// Tableau de bord cloud si on est sur EC2
 async function checkSyncVisibility() {
     try {
         const status = await getSyncStatus();
         if (!status.cloud_url) {
-            // On est sur EC2 — pas de serveur cloud cible configuré
+            // On est sur EC2 — afficher le tableau de bord cloud
+            const stats = await getCloudStats();
             const section = document.getElementById("syncSection");
             if (section) {
+                const derniereSync = stats.derniere_sync
+                    ? new Date(stats.derniere_sync).toLocaleString("fr-FR")
+                    : "Aucune sync reçue";
+
                 section.innerHTML = `
-                    <h3 class="text-xl font-bold mb-4">☁️ Serveur Cloud Central</h3>
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-blue-700 text-sm">
-                        <p class="font-semibold mb-1">✅ Ce serveur est le cloud central</p>
-                        <p>Les serveurs locaux des écoles se synchronisent vers ce serveur.</p>
-                        <p class="mt-2">Progressions reçues : <strong>${status.total_progressions}</strong></p>
+                    <h3 class="text-xl font-bold mb-6">☁️ Tableau de bord Cloud Central</h3>
+
+                    <div class="grid md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-blue-50 rounded-xl p-4 text-center">
+                            <p class="text-3xl font-bold text-blue-600">${stats.total_progressions}</p>
+                            <p class="text-sm text-gray-500 mt-1">Progressions reçues</p>
+                        </div>
+                        <div class="bg-green-50 rounded-xl p-4 text-center">
+                            <p class="text-3xl font-bold text-green-600">${stats.total_avis}</p>
+                            <p class="text-sm text-gray-500 mt-1">Avis reçus</p>
+                        </div>
+                        <div class="bg-purple-50 rounded-xl p-4 text-center">
+                            <p class="text-3xl font-bold text-purple-600">${stats.total_cours_actifs}</p>
+                            <p class="text-sm text-gray-500 mt-1">Cours actifs</p>
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-4 mb-6">
+                        <div class="bg-orange-50 rounded-xl p-4 text-center">
+                            <p class="text-3xl font-bold text-orange-500">${stats.total_eleves}</p>
+                            <p class="text-sm text-gray-500 mt-1">Élèves inscrits</p>
+                        </div>
+                        <div class="bg-pink-50 rounded-xl p-4 text-center">
+                            <p class="text-3xl font-bold text-pink-600">${stats.total_profs}</p>
+                            <p class="text-sm text-gray-500 mt-1">Professeurs</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 rounded-xl p-4 flex justify-between items-center">
+                        <div>
+                            <p class="text-sm text-gray-500">Dernière synchronisation reçue</p>
+                            <p class="font-semibold text-gray-800">${derniereSync}</p>
+                        </div>
+                        <button onclick="checkSyncVisibility()"
+                            class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">
+                            🔄 Actualiser
+                        </button>
+                    </div>
+
+                    <div class="mt-4 bg-green-50 border border-green-200 rounded-lg p-3 text-green-700 text-sm">
+                        ✅ Ce serveur est le cloud central — les écoles locales se synchronisent vers ici
                     </div>
                 `;
             }
         }
-    } catch(e) {}
+    } catch(e) {
+        console.error("Erreur cloud stats:", e);
+    }
 }
 checkSyncVisibility();
 </script>

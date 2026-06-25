@@ -336,3 +336,13 @@ async function supprimerDefinitivement(id) {
     });
     return handleResponse(res);
 }
+
+// ============================================================
+// CLOUD STATS (EC2 uniquement)
+// ============================================================
+async function getCloudStats() {
+    const res = await fetch(`${API_URL}/api/sync/cloud-stats`, {
+        headers: authHeaders()
+    });
+    return handleResponse(res);
+}
