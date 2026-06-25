@@ -87,6 +87,8 @@ async def sync_data(
         "push_progressions": 0,
         "push_avis": 0,
         "pull_cours": 0,
+        "pull_lecons": 0,
+        "pull_quiz": 0,
         "errors": []
     }
 
@@ -164,6 +166,63 @@ async def sync_data(
             resultats["pull_cours"] = nouveaux
         except Exception as e:
             resultats["errors"].append(f"PULL cours: {str(e)}")
+
+        # PHASE 4 — PULL leçons depuis cloud
+        try:
+            from app.models.lecon import Lecon
+            res = await client.get(f"{CLOUD_URL}/api/lecons/all", headers=headers)
+            res.raise_for_status()
+            lecons_cloud = res.json()
+            ids_lecons_locaux = {l.id for l in db.query(Lecon.id).all()}
+            ids_cours_locaux  = {c.id for c in db.query(Cours.id).all()}
+            nouveaux_lecons = 0
+            for l in lecons_cloud:
+                if l["id"] not in ids_lecons_locaux and l["cours_id"] in ids_cours_locaux:
+                    db.add(Lecon(
+                        id       = l["id"],
+                        titre    = l["titre"],
+                        contenu  = l.get("contenu", ""),
+                        cours_id = l["cours_id"],
+                        ordre    = l.get("ordre", 1)
+                    ))
+                    nouveaux_lecons += 1
+            db.commit()
+            resultats["pull_lecons"] = nouveaux_lecons
+        except Exception as e:
+            resultats["errors"].append(f"PULL lecons: {str(e)}")
+
+        # PHASE 5 — PULL quiz depuis cloud
+        try:
+            from app.models.quiz import Quiz
+            from app.models.reponse import Reponse
+            from app.models.lecon import Lecon
+            res = await client.get(f"{CLOUD_URL}/api/quiz/all", headers=headers)
+            res.raise_for_status()
+            quiz_cloud = res.json()
+            ids_quiz_locaux   = {q.id for q in db.query(Quiz.id).all()}
+            ids_lecons_locaux = {l.id for l in db.query(Lecon.id).all()}
+            nouveaux_quiz = 0
+            for q in quiz_cloud:
+                if q["id"] not in ids_quiz_locaux and q["lecon_id"] in ids_lecons_locaux:
+                    nouveau_quiz = Quiz(
+                        id       = q["id"],
+                        question = q["question"],
+                        lecon_id = q["lecon_id"]
+                    )
+                    db.add(nouveau_quiz)
+                    db.flush()
+                    for r in q.get("reponses", []):
+                        db.add(Reponse(
+                            id           = r["id"],
+                            texte        = r["texte"],
+                            est_correcte = r["est_correcte"],
+                            quiz_id      = q["id"]
+                        ))
+                    nouveaux_quiz += 1
+            db.commit()
+            resultats["pull_quiz"] = nouveaux_quiz
+        except Exception as e:
+            resultats["errors"].append(f"PULL quiz: {str(e)}")
 
     success = len(resultats["errors"]) == 0
     return {

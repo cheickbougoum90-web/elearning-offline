@@ -130,3 +130,28 @@ def soumettre_reponse(
         score=score,
         message="Bonne réponse ! 🎉" if correct else "Mauvaise réponse. Réessaie !"
     )
+
+@router.get("/all")
+def get_all_quiz(
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Retourne tous les quiz avec leurs réponses — utilisé pour la sync PULL."""
+    quiz_list = db.query(Quiz).all()
+    return [
+        {
+            "id":       q.id,
+            "question": q.question,
+            "lecon_id": q.lecon_id,
+            "reponses": [
+                {
+                    "id":           r.id,
+                    "texte":        r.texte,
+                    "est_correcte": r.est_correcte,
+                    "quiz_id":      r.quiz_id
+                }
+                for r in q.reponses
+            ]
+        }
+        for q in quiz_list
+    ]
