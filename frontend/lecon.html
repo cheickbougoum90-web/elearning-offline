@@ -195,18 +195,37 @@ async function loadLecons() {
             container.innerHTML = `<p class="text-gray-400 text-center py-10">Aucune leçon disponible.</p>`;
             return;
         }
-        container.innerHTML = toutesLecons.map((l, i) => `
+
+        // Charger les progressions de l'élève (uniquement pour le rôle élève)
+        let leconsTerminees = new Set();
+        if (!estProf) {
+            try {
+                const userId = localStorage.getItem("user_id");
+                const progressions = await fetch(`${API_URL}/api/progression/${userId}`, {
+                    headers: authHeaders()
+                }).then(r => r.json());
+                progressions.forEach(p => {
+                    if (p.statut === "termine") leconsTerminees.add(p.lecon_id);
+                });
+            } catch(e) {}
+        }
+
+        container.innerHTML = toutesLecons.map((l, i) => {
+            const termine = leconsTerminees.has(l.id);
+            return `
             <div onclick="ouvrirLecon(${l.id})"
-                class="bg-white p-4 rounded-xl shadow hover:shadow-md cursor-pointer flex justify-between items-center transition hover:-translate-y-0.5">
+                class="bg-white p-4 rounded-xl shadow hover:shadow-md cursor-pointer flex justify-between items-center transition hover:-translate-y-0.5
+                ${termine ? 'border-l-4 border-green-500' : ''}">
                 <div class="flex items-center gap-3">
-                    <span class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-sm">
-                        ${i + 1}
+                    <span class="w-8 h-8 ${termine ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'} rounded-full flex items-center justify-center font-bold text-sm">
+                        ${termine ? '✓' : i + 1}
                     </span>
                     <span class="font-medium text-gray-800">${l.titre}</span>
+                    ${termine ? '<span class="text-xs text-green-600 font-semibold">Terminée</span>' : ''}
                 </div>
                 <span class="text-gray-400 text-sm">→</span>
             </div>
-        `).join("");
+        `}).join("");
     } catch(e) {
         container.innerHTML = `<p class="text-red-400 text-center">Erreur de chargement.</p>`;
     }
@@ -319,6 +338,7 @@ async function marquerTermine() {
         msg.innerText = "✅ Leçon marquée comme terminée !";
         msg.className = "mt-3 text-sm text-green-600";
         await updateProgressBar();
+        await loadLecons(); // Rafraîchir la liste pour mettre à jour les indicateurs
     } catch(e) {
         msg.innerText = "Erreur : " + e.message;
         msg.className = "mt-3 text-sm text-red-500";
