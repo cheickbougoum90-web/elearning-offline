@@ -19,12 +19,29 @@ def _to_response(c: Cours) -> dict:
         "prof_id": c.prof_id,
         "prof_nom": c.professeur.nom if c.professeur else None,
         "moyenne_notes": c.moyenne_notes,
+        "archive": c.archive,
         "created_at": c.created_at,
     }
 
 @router.get("/", response_model=List[CoursResponse])
 def get_cours(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
-    cours = db.query(Cours).options(joinedload(Cours.professeur)).all()
+    if current_user.role == "admin":
+        # Admin voit tout
+        cours = db.query(Cours).options(joinedload(Cours.professeur)).all()
+    elif current_user.role == "professeur":
+        # Prof voit ses propres cours (archivés ou non) + les cours actifs des autres
+        from sqlalchemy import or_
+        cours = db.query(Cours).options(joinedload(Cours.professeur)).filter(
+            or_(
+                Cours.archive == False,
+                Cours.prof_id == current_user.id
+            )
+        ).all()
+    else:
+        # Élève ne voit que les cours actifs
+        cours = db.query(Cours).options(joinedload(Cours.professeur)).filter(
+            Cours.archive == False
+        ).all()
     return [_to_response(c) for c in cours]
 
 @router.get("/{cours_id}", response_model=CoursResponse)
@@ -153,3 +170,52 @@ def get_prof_stats(
         "nombre_etudiants": nombre_etudiants,
         "note_moyenne": note_moyenne
     }
+
+
+@router.patch("/{cours_id}/archiver")
+def archiver_cours(
+    cours_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(require_role("professeur", "admin"))
+):
+    """Archive un cours (soft delete) — admin ou prof propriétaire.
+    Le cours disparaît pour les élèves mais les progressions sont préservées."""
+    cours = db.query(Cours).filter(Cours.id == cours_id).first()
+    if not cours:
+        raise HTTPException(status_code=404, detail="Cours introuvable")
+    if current_user.role == "professeur" and cours.prof_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Vous ne pouvez archiver que vos propres cours")
+    cours.archive = True
+    db.commit()
+    return {"message": f"Cours '{cours.titre}' archivé avec succès", "cours_id": cours_id}
+
+@router.patch("/{cours_id}/restaurer")
+def restaurer_cours(
+    cours_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(require_role("professeur", "admin"))
+):
+    """Restaure un cours archivé — admin ou prof propriétaire."""
+    cours = db.query(Cours).filter(Cours.id == cours_id).first()
+    if not cours:
+        raise HTTPException(status_code=404, detail="Cours introuvable")
+    if current_user.role == "professeur" and cours.prof_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Vous ne pouvez restaurer que vos propres cours")
+    cours.archive = False
+    db.commit()
+    return {"message": f"Cours '{cours.titre}' restauré avec succès", "cours_id": cours_id}
+
+@router.delete("/{cours_id}/supprimer-definitif")
+def supprimer_definitif(
+    cours_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(require_role("admin"))
+):
+    """Suppression définitive — admin uniquement.
+    Irréversible — détruit le cours et toutes ses données liées."""
+    cours = db.query(Cours).filter(Cours.id == cours_id).first()
+    if not cours:
+        raise HTTPException(status_code=404, detail="Cours introuvable")
+    db.delete(cours)
+    db.commit()
+    return {"message": f"Cours '{cours.titre}' supprimé définitivement"}

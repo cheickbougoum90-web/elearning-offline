@@ -109,9 +109,9 @@ async function loadCours() {
         }
 
         list.innerHTML = cours.map(c => `
-            <div class="bg-white p-5 rounded-xl shadow hover:shadow-md transition" id="cours-${c.id}">
+            <div class="bg-white p-5 rounded-xl shadow hover:shadow-md transition ${c.archive ? 'opacity-60 border-l-4 border-orange-400' : ''}" id="cours-${c.id}">
                 <div class="flex justify-between items-start mb-2">
-                    <h2 class="font-bold text-gray-800">${c.titre}</h2>
+                    <h2 class="font-bold text-gray-800">${c.titre} ${c.archive ? '<span class="text-xs text-orange-500 font-normal">(archivé)</span>' : ''}</h2>
                     <span class="text-yellow-500 text-sm">★ ${c.moyenne_notes.toFixed(1)}</span>
                 </div>
                 <p class="text-gray-500 text-sm">${c.description || "Pas de description"}</p>
@@ -127,11 +127,16 @@ async function loadCours() {
                         ⭐ Noter
                     </a>` : ''}
                     ${(userRole === 'admin' || (userRole === 'professeur' && c.prof_id === parseInt(userId))) ? `
-                    <div class="flex gap-2">
-                        <button onclick="supprimerCours(${c.id})"
-                            class="text-red-500 text-sm hover:underline">
-                            Supprimer
+                    <div class="flex gap-2 items-center">
+                        <button onclick="${c.archive ? 'restaurerCoursUI' : 'archiverCoursUI'}(${c.id}, '${c.titre}')"
+                            class="${c.archive ? 'text-green-600' : 'text-orange-500'} text-sm hover:underline">
+                            ${c.archive ? '↩ Restaurer' : '📦 Archiver'}
                         </button>
+                        ${userRole === 'admin' ? `
+                        <button onclick="supprimerDefinitivementUI(${c.id}, '${c.titre}')"
+                            class="text-red-500 text-sm hover:underline">
+                            🗑 Supprimer
+                        </button>` : ''}
                     </div>` : ''}
                 </div>
             </div>
@@ -180,10 +185,30 @@ async function submitCours() {
     }
 }
 
-async function supprimerCours(id) {
-    if (!confirm("Supprimer ce cours ?")) return;
+async function supprimerDefinitivementUI(id, titre) {
+    if (!confirm(`⚠️ SUPPRESSION DÉFINITIVE de "${titre}" ?\nToutes les leçons, quiz et progressions seront perdus.\nCette action est IRRÉVERSIBLE.`)) return;
     try {
-        await deleteCours(id);
+        await supprimerDefinitivement(id);
+        loadCours();
+    } catch(e) {
+        alert("Erreur : " + e.message);
+    }
+}
+
+async function archiverCoursUI(id, titre) {
+    if (!confirm(`Archiver "${titre}" ? Le cours sera masqué pour les élèves mais les progressions seront préservées.`)) return;
+    try {
+        await archiverCours(id);
+        loadCours();
+    } catch(e) {
+        alert("Erreur : " + e.message);
+    }
+}
+
+async function restaurerCoursUI(id, titre) {
+    if (!confirm(`Restaurer "${titre}" ? Le cours redeviendra visible pour les élèves.`)) return;
+    try {
+        await restaurerCours(id);
         loadCours();
     } catch(e) {
         alert("Erreur : " + e.message);

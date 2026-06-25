@@ -18,6 +18,7 @@ class CoursResponse(CoursBase):
     prof_id: int
     prof_nom: Optional[str] = None
     moyenne_notes: float
+    archive: bool = False
     created_at: datetime
 
     class Config:

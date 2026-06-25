@@ -306,3 +306,33 @@ async function deleteQuiz(quizId) {
     });
     return handleResponse(res);
 }
+
+// ============================================================
+// SOFT DELETE — ARCHIVAGE DES COURS (admin)
+// ============================================================
+async function archiverCours(id) {
+    const res = await fetch(`${API_URL}/api/cours/${id}/archiver`, {
+        method: "PATCH",
+        headers: authHeaders()
+    });
+    return handleResponse(res);
+}
+
+async function restaurerCours(id) {
+    const res = await fetch(`${API_URL}/api/cours/${id}/restaurer`, {
+        method: "PATCH",
+        headers: authHeaders()
+    });
+    return handleResponse(res);
+}
+
+// ============================================================
+// SUPPRESSION DÉFINITIVE (admin uniquement)
+// ============================================================
+async function supprimerDefinitivement(id) {
+    const res = await fetch(`${API_URL}/api/cours/${id}/supprimer-definitif`, {
+        method: "DELETE",
+        headers: authHeaders()
+    });
+    return handleResponse(res);
+}

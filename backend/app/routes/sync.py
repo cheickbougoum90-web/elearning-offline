@@ -89,6 +89,7 @@ async def sync_data(
         "pull_cours": 0,
         "pull_lecons": 0,
         "pull_quiz": 0,
+        "cours_archives": 0,
         "errors": []
     }
 
@@ -145,13 +146,23 @@ async def sync_data(
         except Exception as e:
             resultats["errors"].append(f"PUSH avis: {str(e)}")
 
-        # PHASE 3 — PULL cours depuis cloud
+        # PHASE 3 — PULL cours depuis cloud (avec soft delete)
         try:
             res = await client.get(f"{CLOUD_URL}/api/cours/", headers=headers)
             res.raise_for_status()
             cours_cloud = res.json()
-            ids_locaux  = {c.id for c in db.query(Cours.id).all()}
-            nouveaux    = 0
+
+            # IDs des cours actifs sur EC2 (non archivés)
+            ids_cloud_actifs = {c["id"] for c in cours_cloud if not c.get("archive", False)}
+
+            # Tous les cours locaux
+            cours_locaux = db.query(Cours).all()
+            ids_locaux   = {c.id for c in cours_locaux}
+
+            nouveaux  = 0
+            archives  = 0
+
+            # Ajouter les nouveaux cours
             for c in cours_cloud:
                 if c["id"] not in ids_locaux:
                     db.add(Cours(
@@ -159,11 +170,20 @@ async def sync_data(
                         titre         = c["titre"],
                         description   = c.get("description", ""),
                         prof_id       = c["prof_id"],
-                        moyenne_notes = c.get("moyenne_notes", 0)
+                        moyenne_notes = c.get("moyenne_notes", 0),
+                        archive       = c.get("archive", False)
                     ))
                     nouveaux += 1
+
+            # Archiver localement les cours supprimés/archivés sur EC2
+            for cours_local in cours_locaux:
+                if cours_local.id not in ids_cloud_actifs and not cours_local.archive:
+                    cours_local.archive = True
+                    archives += 1
+
             db.commit()
             resultats["pull_cours"] = nouveaux
+            resultats["cours_archives"] = archives
         except Exception as e:
             resultats["errors"].append(f"PULL cours: {str(e)}")
 
