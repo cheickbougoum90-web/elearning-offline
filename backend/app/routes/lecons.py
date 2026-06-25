@@ -45,6 +45,24 @@ def get_lecons_by_cours(
         Lecon.cours_id == cours_id
     ).order_by(Lecon.ordre).all()
 
+@router.get("/all")
+def get_all_lecons(
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Retourne toutes les leçons — utilisé pour la sync PULL."""
+    lecons = db.query(Lecon).order_by(Lecon.cours_id, Lecon.ordre).all()
+    return [
+        {
+            "id":       l.id,
+            "titre":    l.titre,
+            "contenu":  l.contenu,
+            "cours_id": l.cours_id,
+            "ordre":    l.ordre
+        }
+        for l in lecons
+    ]
+
 @router.get("/{lecon_id}", response_model=LeconResponse)
 def get_lecon(
     lecon_id: int,
@@ -158,20 +176,3 @@ def delete_media(
     db.commit()
     return {"message": f"Média {media_id} supprimé"}
 
-@router.get("/all")
-def get_all_lecons(
-    db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
-):
-    """Retourne toutes les leçons — utilisé pour la sync PULL."""
-    lecons = db.query(Lecon).order_by(Lecon.cours_id, Lecon.ordre).all()
-    return [
-        {
-            "id":       l.id,
-            "titre":    l.titre,
-            "contenu":  l.contenu,
-            "cours_id": l.cours_id,
-            "ordre":    l.ordre
-        }
-        for l in lecons
-    ]
