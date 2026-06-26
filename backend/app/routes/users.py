@@ -121,3 +121,21 @@ def stop_impersonation(
     """Permet de revenir au compte admin d'origine après une impersonation.
     Nécessite que le frontend ait conservé le token admin original."""
     return {"message": "Utilisez le token admin sauvegardé côté client pour revenir."}
+
+@router.get("/all")
+def get_all_users(
+    db: Session = Depends(get_db),
+    current_user=Depends(require_role("admin"))
+):
+    """Retourne tous les utilisateurs — utilisé pour la sync PULL.
+    Ne retourne jamais les mots de passe."""
+    users = db.query(Utilisateur).all()
+    return [
+        {
+            "id":    u.id,
+            "nom":   u.nom,
+            "email": u.email,
+            "role":  u.role
+        }
+        for u in users
+    ]

@@ -103,6 +103,7 @@ async def sync_data(
     resultats = {
         "push_progressions": 0,
         "push_avis": 0,
+        "pull_users": 0,
         "pull_cours": 0,
         "pull_lecons": 0,
         "pull_quiz": 0,
@@ -205,6 +206,31 @@ async def sync_data(
             resultats["cours_archives"] = archives
         except Exception as e:
             resultats["errors"].append(f"PULL cours: {str(e)}")
+
+        # PHASE 3.5 — PULL utilisateurs depuis cloud
+        try:
+            from app.models.utilisateur import Utilisateur
+            from app.auth import hash_password
+            res = await client.get(f"{CLOUD_URL}/api/users/all", headers=headers)
+            res.raise_for_status()
+            users_cloud = res.json()
+            ids_users_locaux = {u.id for u in db.query(Utilisateur.id).all()}
+            nouveaux_users = 0
+            for u in users_cloud:
+                if u["id"] not in ids_users_locaux:
+                    # Créer l'utilisateur avec un mot de passe temporaire
+                    db.add(Utilisateur(
+                        id=u["id"],
+                        nom=u["nom"],
+                        email=u["email"],
+                        role=u["role"],
+                        mot_de_passe=hash_password("changeme2026")
+                    ))
+                    nouveaux_users += 1
+            db.commit()
+            resultats["pull_users"] = nouveaux_users
+        except Exception as e:
+            resultats["errors"].append(f"PULL users: {str(e)}")
 
         # PHASE 4 — PULL leçons depuis cloud
         try:
