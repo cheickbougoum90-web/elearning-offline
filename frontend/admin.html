@@ -250,7 +250,17 @@ async function lancerSync() {
 
     try {
         const res = await syncData();
-        msg.innerText = `✅ ${res.message} — ${res.donnees_synchronisees} élément(s) synchronisé(s)`;
+        const d = res.details || {};
+        const parts = [];
+        if (d.push_progressions > 0) parts.push(`${d.push_progressions} progression(s) envoyée(s)`);
+        if (d.push_avis > 0) parts.push(`${d.push_avis} avis envoyé(s)`);
+        if (d.pull_users > 0) parts.push(`${d.pull_users} utilisateur(s) reçu(s)`);
+        if (d.pull_cours > 0) parts.push(`${d.pull_cours} cours reçu(s)`);
+        if (d.pull_lecons > 0) parts.push(`${d.pull_lecons} leçon(s) reçue(s)`);
+        if (d.pull_quiz > 0) parts.push(`${d.pull_quiz} quiz reçu(s)`);
+        if (d.cours_archives > 0) parts.push(`${d.cours_archives} cours archivé(s)`);
+        const detail = parts.length > 0 ? parts.join(", ") : "Aucune nouvelle donnée";
+        msg.innerText = `✅ ${res.message} — ${detail}`;
         msg.className = "mt-3 text-sm text-green-600";
         loadDashboard();
     } catch (e) {
