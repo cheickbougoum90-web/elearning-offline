@@ -329,10 +329,10 @@ async def cloud_stats(
 
     ecoles = db.query(
         SyncLog.source_ip,
-        SyncLog.school_name,
+        sqlfunc.max(SyncLog.school_name).label("school_name"),
         sqlfunc.sum(SyncLog.nb_progressions).label("total_prog"),
         sqlfunc.max(SyncLog.created_at).label("derniere_sync_ecole")
-    ).group_by(SyncLog.source_ip, SyncLog.school_name).all()
+    ).group_by(SyncLog.source_ip).all()
 
     ecoles_data = [
         {
