@@ -339,7 +339,10 @@ async function checkSyncVisibility() {
                                 <div class="flex justify-between items-center bg-gray-50 rounded-lg p-3">
                                     <div class="flex items-center gap-2">
                                         <span class="w-2 h-2 bg-green-500 rounded-full"></span>
-                                        <span class="font-mono text-sm text-gray-700">${e.ip}</span>
+                                        <div>
+                                            <p class="font-semibold text-sm text-gray-800">🏫 ${e.nom}</p>
+                                            <p class="font-mono text-xs text-gray-400">${e.ip}</p>
+                                        </div>
                                     </div>
                                     <div class="text-right text-sm">
                                         <span class="text-blue-600 font-semibold">${e.progressions} progression(s)</span>

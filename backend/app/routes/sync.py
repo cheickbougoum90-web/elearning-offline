@@ -12,7 +12,8 @@ from app.auth import require_role, create_access_token
 
 router = APIRouter(prefix="/api/sync", tags=["Synchronisation"])
 
-CLOUD_URL = os.getenv("CLOUD_SERVER_URL", "")
+CLOUD_URL   = os.getenv("CLOUD_SERVER_URL", "")
+SCHOOL_NAME = os.getenv("SCHOOL_NAME", "École inconnue")
 
 def get_cloud_token() -> str:
     return create_access_token(data={"sub": "1", "role": "admin"})
@@ -51,12 +52,14 @@ def receive_progressions(payload: dict, request: Request, db: Session = Depends(
             inserted += 1
     db.commit()
 
-    # Logger l'IP source
+    # Logger l'IP source et le nom de l'école
     try:
         from app.models.sync_log import SyncLog
-        source_ip = request.client.host
+        source_ip   = request.client.host
+        school_name = payload.get("school_name", "École inconnue")
         db.add(SyncLog(
             source_ip=source_ip,
+            school_name=school_name,
             nb_progressions=inserted + updated,
             nb_avis=0
         ))
@@ -116,7 +119,9 @@ async def sync_data(
         try:
             non_synced = db.query(Progression).filter(Progression.synced == False).all()
             if non_synced:
-                payload = {"progressions": [
+                payload = {
+                    "school_name": SCHOOL_NAME,
+                    "progressions": [
                     {
                         "user_id":    p.user_id,
                         "lecon_id":   p.lecon_id,
@@ -324,13 +329,15 @@ async def cloud_stats(
 
     ecoles = db.query(
         SyncLog.source_ip,
+        SyncLog.school_name,
         sqlfunc.sum(SyncLog.nb_progressions).label("total_prog"),
         sqlfunc.max(SyncLog.created_at).label("derniere_sync_ecole")
-    ).group_by(SyncLog.source_ip).all()
+    ).group_by(SyncLog.source_ip, SyncLog.school_name).all()
 
     ecoles_data = [
         {
             "ip": e.source_ip,
+            "nom": e.school_name or e.source_ip,
             "progressions": int(e.total_prog or 0),
             "derniere_sync": str(e.derniere_sync_ecole) if e.derniere_sync_ecole else None
         }
