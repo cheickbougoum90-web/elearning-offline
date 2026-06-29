@@ -309,7 +309,7 @@ async def sync_status(
     cloud_accessible = False
     if CLOUD_URL:
         try:
-            async with httpx.AsyncClient(timeout=5.0) as client:
+            async with httpx.AsyncClient(timeout=2.0) as client:
                 res = await client.get(f"{CLOUD_URL}/")
                 cloud_accessible = res.status_code == 200
         except:

@@ -4,15 +4,31 @@
 
 let syncEnCours = false;
 
-function updateNetworkStatus() {
+async function updateNetworkStatus() {
     const status = document.getElementById("network-status");
     if (!status) return;
-    if (navigator.onLine) {
-        status.innerText = "🟢 En ligne";
-        status.className = "text-green-600 font-semibold";
-    } else {
+    if (!navigator.onLine) {
         status.innerText = "🔴 Hors ligne";
         status.className = "text-red-600 font-semibold";
+        return;
+    }
+    // Tester l'accès réel au cloud via le backend local
+    try {
+        const res = await fetch("/api/sync/status", {
+            headers: { "Authorization": "Bearer " + (localStorage.getItem("token") || "") },
+            signal: AbortSignal.timeout(5000)
+        });
+        const data = await res.json();
+        if (data.cloud_accessible) {
+            status.innerText = "🟢 En ligne — Cloud accessible";
+            status.className = "text-green-600 font-semibold";
+        } else {
+            status.innerText = "🟡 Réseau local — Cloud inaccessible";
+            status.className = "text-yellow-600 font-semibold";
+        }
+    } catch(e) {
+        status.innerText = "🟡 Réseau local — Cloud inaccessible";
+        status.className = "text-yellow-600 font-semibold";
     }
 }
 
